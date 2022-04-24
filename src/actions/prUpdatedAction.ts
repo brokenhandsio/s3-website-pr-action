@@ -14,7 +14,7 @@ export const requiredEnvVars = [
 ];
 
 export default async (bucketName: string, uploadDirectory: string, environmentPrefix: string) => {
-  const websiteUrl = `http://${bucketName}.s3-website-us-east-1.amazonaws.com`;
+  const websiteUrl = `https://s3.amazonaws.com/${bucketName}/index.html`;
   const { repo } = github.context;
   const branchName = github.context.payload.pull_request!.head.ref;
 
