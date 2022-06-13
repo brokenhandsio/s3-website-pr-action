@@ -1,4 +1,5 @@
 import * as github from "@actions/github";
+import * as githubCore from '@actions/core';
 import S3 from "../s3Client";
 import s3UploadDirectory from "../utils/s3UploadDirectory";
 import validateEnvVars from "../utils/validateEnvVars";
@@ -67,6 +68,8 @@ export default async (bucketName: string, uploadDirectory: string, environmentPr
       state: "success",
       environment_url: websiteUrl,
     });
+
+    githubCore.setOutput('websiteUrl', websiteUrl);
 
     console.log(`Website URL: ${websiteUrl}`);
   }

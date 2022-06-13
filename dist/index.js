@@ -7783,6 +7783,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requiredEnvVars = void 0;
 const github = __importStar(__webpack_require__(469));
+const githubCore = __importStar(__webpack_require__(470));
 const s3Client_1 = __importDefault(__webpack_require__(882));
 const s3UploadDirectory_1 = __importDefault(__webpack_require__(704));
 const validateEnvVars_1 = __importDefault(__webpack_require__(732));
@@ -7823,6 +7824,7 @@ exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(
         console.log("Uploading files...");
         yield s3UploadDirectory_1.default(bucketName, uploadDirectory);
         yield githubClient_1.default.repos.createDeploymentStatus(Object.assign(Object.assign({}, repo), { deployment_id: deployment.data.id, state: "success", environment_url: websiteUrl }));
+        githubCore.setOutput('websiteUrl', websiteUrl);
         console.log(`Website URL: ${websiteUrl}`);
     }
 });
