@@ -9296,7 +9296,7 @@ exports.requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB
 exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(void 0, void 0, void 0, function* () {
     const websiteUrl = `https://s3.amazonaws.com/${bucketName}/index.html`;
     const { repo } = github.context;
-    const branchName = github.context.payload.pull_request.head.ref;
+    const branchName = github.context.ref;
     validateEnvVars_1.default(exports.requiredEnvVars);
     const bucketExists = yield checkBucketExists_1.default(bucketName);
     if (!bucketExists) {

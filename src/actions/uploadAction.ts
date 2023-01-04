@@ -14,7 +14,7 @@ export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'G
 export default async (bucketName: string, uploadDirectory: string, environmentPrefix: string) => {
 	const websiteUrl = `https://s3.amazonaws.com/${bucketName}/index.html`
 	const { repo } = github.context
-	const branchName = github.context.payload.pull_request!.head.ref
+	const branchName = github.context.ref
 
 	validateEnvVars(requiredEnvVars)
 
