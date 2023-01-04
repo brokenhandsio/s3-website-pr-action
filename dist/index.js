@@ -7799,7 +7799,7 @@ exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(
     validateEnvVars_1.default(exports.requiredEnvVars);
     const bucketExists = yield checkBucketExists_1.default(bucketName);
     if (!bucketExists) {
-        console.log('S3 bucket does not exist. Creating...');
+        console.log(`S3 bucket does not exist. Creating ${bucketName}...`);
         yield s3Client_1.default.createBucket({ Bucket: bucketName }).promise();
         console.log('Configuring bucket website...');
         yield s3Client_1.default.putBucketWebsite({
@@ -9300,7 +9300,7 @@ exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(
     validateEnvVars_1.default(exports.requiredEnvVars);
     const bucketExists = yield checkBucketExists_1.default(bucketName);
     if (!bucketExists) {
-        console.log('S3 bucket does not exist. Creating...');
+        console.log(`S3 bucket does not exist. Creating ${bucketName}...`);
         yield s3Client_1.default.createBucket({ Bucket: bucketName }).promise();
         console.log('Configuring bucket website...');
         yield s3Client_1.default.putBucketWebsite({
@@ -12236,7 +12236,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         else {
-            const bucketName = `${bucketPrefix}-${dayjs_1.default().format('DD-MM-YYYY-hh:mma')}`;
+            const bucketName = `${bucketPrefix}-${dayjs_1.default().format('DD-MM-YYYY-hh-mma')}`;
             yield uploadAction_1.default(bucketName, folderToCopy, environmentPrefix);
         }
     }

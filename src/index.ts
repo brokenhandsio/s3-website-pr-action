@@ -35,7 +35,7 @@ const main = async () => {
 					break
 			}
 		} else {
-			const bucketName = `${bucketPrefix}-${dayjs().format('DD-MM-YYYY-hh:mma')}`
+			const bucketName = `${bucketPrefix}-${dayjs().format('DD-MM-YYYY-hh-mma')}`
 
 			await uploadAction(bucketName, folderToCopy, environmentPrefix)
 		}

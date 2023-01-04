@@ -22,7 +22,7 @@ export default async (bucketName: string, uploadDirectory: string, environmentPr
 	const bucketExists = await checkBucketExists(bucketName)
 
 	if (!bucketExists) {
-		console.log('S3 bucket does not exist. Creating...')
+		console.log(`S3 bucket does not exist. Creating ${bucketName}...`)
 		await S3.createBucket({ Bucket: bucketName }).promise()
 
 		console.log('Configuring bucket website...')
