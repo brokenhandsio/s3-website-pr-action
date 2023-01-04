@@ -40,7 +40,7 @@ export default async (bucketName: string, uploadDirectory: string, environmentPr
 
 	const deployment = await githubClient.repos.createDeployment({
 		...repo,
-		ref: `refs/heads/${branchName}`,
+		ref: `${branchName}`,
 		environment: `${environmentPrefix || 'ACTION-'}${dayjs().format('DD-MM-YYYY-hh:mma')}`,
 		auto_merge: false,
 		transient_environment: true,
