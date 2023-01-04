@@ -9315,7 +9315,7 @@ exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(
         console.log('S3 Bucket already exists. Skipping creation...');
     }
     yield deactivateDeployments_1.default(repo, environmentPrefix);
-    const deployment = yield githubClient_1.default.repos.createDeployment(Object.assign(Object.assign({}, repo), { ref: `refs/heads/${branchName}`, environment: `${environmentPrefix || 'ACTION-'}${dayjs_1.default().format('DD-MM-YYYY[_]hh:mm:ssa')}`, auto_merge: false, transient_environment: true, required_contexts: [] }));
+    const deployment = yield githubClient_1.default.repos.createDeployment(Object.assign(Object.assign({}, repo), { ref: `refs/heads/${branchName}`, environment: `${environmentPrefix || 'ACTION-'}${dayjs_1.default().format('DD-MM-YYYY-hh:mma')}`, auto_merge: false, transient_environment: true, required_contexts: [] }));
     if (isSuccessResponse(deployment.data)) {
         yield githubClient_1.default.repos.createDeploymentStatus(Object.assign(Object.assign({}, repo), { deployment_id: deployment.data.id, state: 'in_progress' }));
         console.log('Uploading files...');
@@ -12209,6 +12209,7 @@ const github = __importStar(__webpack_require__(469));
 const prClosedAction_1 = __importDefault(__webpack_require__(751));
 const prUpdatedAction_1 = __importDefault(__webpack_require__(161));
 const uploadAction_1 = __importDefault(__webpack_require__(228));
+const dayjs_1 = __importDefault(__webpack_require__(874));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const bucketPrefix = core.getInput('bucket-prefix');
@@ -12235,8 +12236,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
         else {
-            const lastCommitSha = github.context.sha;
-            const bucketName = `${bucketPrefix}-${githubEventName}-${lastCommitSha.slice(0, 7)}`;
+            const bucketName = `${bucketPrefix}-${dayjs_1.default().format('DD-MM-YYYY-hh:mma')}`;
             yield uploadAction_1.default(bucketName, folderToCopy, environmentPrefix);
         }
     }

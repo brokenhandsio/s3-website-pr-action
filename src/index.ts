@@ -3,6 +3,7 @@ import * as github from '@actions/github'
 import prClosedAction from './actions/prClosedAction'
 import prUpdatedAction from './actions/prUpdatedAction'
 import uploadAction from './actions/uploadAction'
+import dayjs from 'dayjs'
 
 const main = async () => {
 	try {
@@ -34,9 +35,7 @@ const main = async () => {
 					break
 			}
 		} else {
-			const lastCommitSha = github.context.sha
-
-			const bucketName = `${bucketPrefix}-${githubEventName}-${lastCommitSha.slice(0, 7)}`
+			const bucketName = `${bucketPrefix}-${dayjs().format('DD-MM-YYYY-hh:mma')}`
 
 			await uploadAction(bucketName, folderToCopy, environmentPrefix)
 		}
