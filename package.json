@@ -15,6 +15,7 @@
     "@actions/github": "^3.0.0",
     "@octokit/types": "^5.0.0",
     "aws-sdk": "^2.684.0",
+    "dayjs": "^1.11.7",
     "mime-types": "^2.1.27",
     "recursive-readdir": "^2.2.2"
   },

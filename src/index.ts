@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import prClosedAction from './actions/prClosedAction'
 import prUpdatedAction from './actions/prUpdatedAction'
+import uploadAction from './actions/uploadAction'
 
 const main = async () => {
 	try {
@@ -9,14 +10,14 @@ const main = async () => {
 		const folderToCopy = core.getInput('folder-to-copy')
 		const environmentPrefix = core.getInput('environment-prefix')
 
-		const prNumber = github.context.payload.pull_request!.number
-		const bucketName = `${bucketPrefix}-pr${prNumber}`
+		const githubEventName = github.context.eventName
+		if (githubEventName === 'pull_request') {
+			const prNumber = github.context.payload.pull_request!.number
+			const bucketName = `${bucketPrefix}-pr-${prNumber}`
 
-		console.log(`Bucket Name: ${bucketName}`)
+			console.log(`Bucket Name: ${bucketName}`)
 
-		const githubActionType = github.context.payload.action
-
-		if (github.context.eventName === 'pull_request') {
+			const githubActionType = github.context.payload.action
 			switch (githubActionType) {
 				case 'opened':
 				case 'reopened':
@@ -33,7 +34,11 @@ const main = async () => {
 					break
 			}
 		} else {
-			console.log('Not a PR. Skipping...')
+			const lastCommitSha = github.context.sha
+
+			const bucketName = `${bucketPrefix}-${githubEventName}-${lastCommitSha.slice(0, 7)}`
+
+			await uploadAction(bucketName, folderToCopy, environmentPrefix)
 		}
 	} catch (error) {
 		console.log(error)

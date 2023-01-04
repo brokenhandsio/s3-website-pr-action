@@ -1,4 +1,4 @@
-# Actions - s3-website-pr-action 🚀 ![Main Workflow](https://github.com/danburtenshaw/s3-website-pr-action/workflows/Main%20Workflow/badge.svg) ![Github Actions Marketplace](https://img.shields.io/badge/Marketplace-Github%20Action-brightgreen)
+# Actions - s3-website-pr-action 🚀
 
 ### Automatically deploy built PR bundles to an S3 static website
 
@@ -43,22 +43,22 @@ The site url will be posted as a comment on the pull request.
 Note: By default, workflows using the `pull_request` activity type will include the above events. [Docs](https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request)
 
 ### Required Environment Variables
-Environment Variable | Description
------------- | -------------
-AWS_ACCESS_KEY_ID | AWS Access Key ID of an IAM user
-AWS_SECRET_ACCESS_KEY | AWS Secret Access Key of an IAM user
-GITHUB_TOKEN | GitHub automatically provides the secret value
+| Environment Variable  | Description                                    |
+| --------------------- | ---------------------------------------------- |
+| AWS_ACCESS_KEY_ID     | AWS Access Key ID of an IAM user               |
+| AWS_SECRET_ACCESS_KEY | AWS Secret Access Key of an IAM user           |
+| GITHUB_TOKEN          | GitHub automatically provides the secret value |
 
 ### Required Parameters
-Parameter | Description
------------- | -------------
-bucket-prefix | Prefix to the S3 bucket name
-folder-to-copy | The directory to your built web app. This folder will be copied to S3
+| Parameter      | Description                                                           |
+| -------------- | --------------------------------------------------------------------- |
+| bucket-prefix  | Prefix to the S3 bucket name                                          |
+| folder-to-copy | The directory to your built web app. This folder will be copied to S3 |
 
 ### Optional Parameters
-Parameter | Description
------------- | -------------
-environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-'
+| Parameter          | Description                                        |
+| ------------------ | -------------------------------------------------- |
+| environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-' |
 
 
 ## PR closed:
@@ -86,21 +86,21 @@ build:
 Execute the `s3-website-pr-action` action on pull request `closed` events. This will remove the S3 bucket that was created in the previous stage.
 
 ### Required Environment Variables
-Environment Variable | Description
------------- | -------------
-AWS_ACCESS_KEY_ID | AWS Access Key ID of an IAM user
-AWS_SECRET_ACCESS_KEY | AWS Secret Access Key of an IAM user
-GITHUB_TOKEN | GitHub automatically provides the secret value
+| Environment Variable  | Description                                    |
+| --------------------- | ---------------------------------------------- |
+| AWS_ACCESS_KEY_ID     | AWS Access Key ID of an IAM user               |
+| AWS_SECRET_ACCESS_KEY | AWS Secret Access Key of an IAM user           |
+| GITHUB_TOKEN          | GitHub automatically provides the secret value |
 
 ### Required Parameters
-Parameter | Description
------------- | -------------
-bucket-prefix | Prefix to the S3 bucket name. This should be the same value as the other stage
+| Parameter     | Description                                                                    |
+| ------------- | ------------------------------------------------------------------------------ |
+| bucket-prefix | Prefix to the S3 bucket name. This should be the same value as the other stage |
 
 ### Optional Parameters
-Parameter | Description
------------- | -------------
-environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-'
+| Parameter          | Description                                        |
+| ------------------ | -------------------------------------------------- |
+| environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-' |
 
 # IAM 🔐
 
