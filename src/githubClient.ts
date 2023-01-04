@@ -1,5 +1,5 @@
-import * as github from '@actions/github';
+import * as github from '@actions/github'
 
-const { GITHUB_TOKEN } = process.env;
+const { GITHUB_TOKEN } = process.env
 
-export default github.getOctokit(GITHUB_TOKEN, { previews: ['ant-man-preview', 'flash-preview'] });
+export default github.getOctokit(GITHUB_TOKEN, { previews: ['ant-man-preview', 'flash-preview'] })

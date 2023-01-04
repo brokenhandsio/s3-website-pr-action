@@ -1,16 +1,19 @@
-import * as github from "@actions/github";
-import githubClient from '../githubClient';
+import * as github from '@actions/github'
+import githubClient from '../githubClient'
 
 export default async (
-    repo: {
-        owner: string;
-        repo: string;
-    },
-    environmentPrefix: string
+	repo: {
+		owner: string
+		repo: string
+	},
+	environmentPrefix: string
 ) => {
-    const environment = `${environmentPrefix || 'PR-'}${github.context.payload.pull_request!.number}`;
+	const environment = `${environmentPrefix || 'PR-'}${
+		github.context.payload.pull_request!.number
+	}`
 
-    const deployments = await githubClient.graphql(`
+	const deployments = await githubClient.graphql(
+		`
       query GetDeployments($owner: String!, $repo: String!, $environments: [String!]) {
         repository(owner: $owner, name: $repo) {
           deployments(first: 100, environments: $environments) {
@@ -19,26 +22,31 @@ export default async (
             }
           }
         }
-      }`, { ...repo, environments: [environment] })
+      }`,
+		{ ...repo, environments: [environment] }
+	)
 
-    const nodes = deployments.repository?.deployments?.nodes;
+	const nodes = deployments.repository?.deployments?.nodes
 
-    console.log(JSON.stringify(deployments))
+	console.log(JSON.stringify(deployments))
 
-    if (nodes.length <= 0) {
-        console.log(`No exiting deployments found for pull request`);
-        return;
-    }
+	if (nodes.length <= 0) {
+		console.log('No exiting deployments found for pull request')
+		return
+	}
 
-    for (const node of nodes) {
-        console.log(`Deleting existing deployment - ${node.id}`);
+	for (const node of nodes) {
+		console.log(`Deleting existing deployment - ${node.id}`)
 
-        await githubClient.graphql(`
+		await githubClient.graphql(
+			`
           mutation DeleteDeployment($id: ID!) {
             deleteDeployment(input: {id: $id} ) {
               clientMutationId
             }
           }
-        `, { id: node.id })
-    }
+        `,
+			{ id: node.id }
+		)
+	}
 }
