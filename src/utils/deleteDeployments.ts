@@ -1,5 +1,6 @@
 import * as github from '@actions/github'
 import githubClient from '../githubClient'
+import dayjs from 'dayjs'
 
 export default async (
 	repo: {
@@ -8,9 +9,11 @@ export default async (
 	},
 	environmentPrefix: string
 ) => {
-	const environment = `${environmentPrefix || 'PR-'}${
-		github.context.payload.pull_request!.number
-	}`
+	const githubEventName = github.context.eventName
+	const environment =
+		githubEventName === 'pull_request'
+			? `${environmentPrefix || 'PR-'}${github.context.payload.pull_request!.number}`
+			: `${environmentPrefix || 'ACTION-'}${dayjs().format('DD-MM-YYYY-hh:mma')}`
 
 	const deployments = await githubClient.graphql(
 		`

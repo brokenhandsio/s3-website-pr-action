@@ -290,8 +290,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const github = __importStar(__webpack_require__(469));
 const githubClient_1 = __importDefault(__webpack_require__(119));
+const dayjs_1 = __importDefault(__webpack_require__(874));
 exports.default = (repo, environmentPrefix) => __awaiter(void 0, void 0, void 0, function* () {
-    const environment = `${environmentPrefix || 'PR-'}${github.context.payload.pull_request.number}`;
+    const githubEventName = github.context.eventName;
+    const environment = githubEventName === 'pull_request'
+        ? `${environmentPrefix || 'PR-'}${github.context.payload.pull_request.number}`
+        : `${environmentPrefix || 'ACTION-'}${dayjs_1.default().format('DD-MM-YYYY-hh:mma')}`;
     const deployments = yield githubClient_1.default.repos.listDeployments({
         repo: repo.repo,
         owner: repo.owner,
@@ -13774,9 +13778,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const github = __importStar(__webpack_require__(469));
 const githubClient_1 = __importDefault(__webpack_require__(119));
+const dayjs_1 = __importDefault(__webpack_require__(874));
 exports.default = (repo, environmentPrefix) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    const environment = `${environmentPrefix || 'PR-'}${github.context.payload.pull_request.number}`;
+    const githubEventName = github.context.eventName;
+    const environment = githubEventName === 'pull_request'
+        ? `${environmentPrefix || 'PR-'}${github.context.payload.pull_request.number}`
+        : `${environmentPrefix || 'ACTION-'}${dayjs_1.default().format('DD-MM-YYYY-hh:mma')}`;
     const deployments = yield githubClient_1.default.graphql(`
       query GetDeployments($owner: String!, $repo: String!, $environments: [String!]) {
         repository(owner: $owner, name: $repo) {
