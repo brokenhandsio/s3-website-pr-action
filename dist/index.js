@@ -9319,7 +9319,7 @@ exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(
         console.log('S3 Bucket already exists. Skipping creation...');
     }
     yield deactivateDeployments_1.default(repo, environmentPrefix);
-    const deployment = yield githubClient_1.default.repos.createDeployment(Object.assign(Object.assign({}, repo), { ref: `refs/heads/${branchName}`, environment: `${environmentPrefix || 'ACTION-'}${dayjs_1.default().format('DD-MM-YYYY-hh:mma')}`, auto_merge: false, transient_environment: true, required_contexts: [] }));
+    const deployment = yield githubClient_1.default.repos.createDeployment(Object.assign(Object.assign({}, repo), { ref: `${branchName}`, environment: `${environmentPrefix || 'ACTION-'}${dayjs_1.default().format('DD-MM-YYYY-hh:mma')}`, auto_merge: false, transient_environment: true, required_contexts: [] }));
     if (isSuccessResponse(deployment.data)) {
         yield githubClient_1.default.repos.createDeploymentStatus(Object.assign(Object.assign({}, repo), { deployment_id: deployment.data.id, state: 'in_progress' }));
         console.log('Uploading files...');
