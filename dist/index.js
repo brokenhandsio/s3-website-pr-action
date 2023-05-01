@@ -7804,7 +7804,7 @@ exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(
     const bucketExists = yield checkBucketExists_1.default(bucketName);
     if (!bucketExists) {
         console.log(`S3 bucket does not exist. Creating ${bucketName}...`);
-        yield s3Client_1.default.createBucket({ Bucket: bucketName }).promise();
+        yield s3Client_1.default.createBucket({ Bucket: bucketName, ACL: 'public-read-write' }).promise();
         console.log('Configuring bucket website...');
         yield s3Client_1.default.putBucketWebsite({
             Bucket: bucketName,
@@ -9305,7 +9305,7 @@ exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(
     const bucketExists = yield checkBucketExists_1.default(bucketName);
     if (!bucketExists) {
         console.log(`S3 bucket does not exist. Creating ${bucketName}...`);
-        yield s3Client_1.default.createBucket({ Bucket: bucketName }).promise();
+        yield s3Client_1.default.createBucket({ Bucket: bucketName, ACL: 'public-read-write' }).promise();
         console.log('Configuring bucket website...');
         yield s3Client_1.default.putBucketWebsite({
             Bucket: bucketName,
