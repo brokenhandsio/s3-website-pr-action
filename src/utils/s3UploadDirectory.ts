@@ -4,11 +4,15 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import filePathToS3Key from './filePathToS3Key'
 import mimeTypes from 'mime-types'
+import validateEnvVars from './validateEnvVars'
+
+export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
 
 export default async (bucketName: string, directory: string) => {
 	const normalizedPath = path.normalize(directory)
 
 	const files = await readdir(normalizedPath)
+	validateEnvVars(requiredEnvVars)
 
 	await Promise.all(
 		files.map(async filePath => {
@@ -20,7 +24,7 @@ export default async (bucketName: string, directory: string) => {
 				const fileBuffer = await fs.readFile(filePath)
 				const mimeType = mimeTypes.lookup(filePath) || 'application/octet-stream'
 
-				await S3.putObject({
+				const response = await S3.putObject({
 					Bucket: bucketName,
 					Key: s3Key,
 					Body: fileBuffer,
@@ -28,7 +32,10 @@ export default async (bucketName: string, directory: string) => {
 					ServerSideEncryption: 'AES256',
 					ContentType: mimeType
 				}).promise()
+
+				console.log({ response })
 			} catch (e) {
+				console.log(e)
 				const message = `Failed to upload ${s3Key}: ${e.code} - ${e.message}`
 				console.log(message)
 				throw message
