@@ -4,15 +4,11 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import filePathToS3Key from './filePathToS3Key'
 import mimeTypes from 'mime-types'
-import validateEnvVars from './validateEnvVars'
-
-export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
 
 export default async (bucketName: string, directory: string) => {
 	const normalizedPath = path.normalize(directory)
 
 	const files = await readdir(normalizedPath)
-	validateEnvVars(requiredEnvVars)
 
 	await Promise.all(
 		files.map(async filePath => {
