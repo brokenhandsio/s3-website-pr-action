@@ -8479,6 +8479,15 @@ exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(
                 ]
             }
         }).promise();
+        yield s3Client_1.default.putPublicAccessBlock({
+            Bucket: bucketName,
+            PublicAccessBlockConfiguration: {
+                BlockPublicAcls: false,
+                BlockPublicPolicy: false,
+                IgnorePublicAcls: false,
+                RestrictPublicBuckets: false
+            }
+        }).promise();
         console.log('Configuring bucket website...');
         yield s3Client_1.default.putBucketWebsite({
             Bucket: bucketName,
@@ -10121,6 +10130,7 @@ exports.default = (bucketName) => __awaiter(void 0, void 0, void 0, function* ()
         return true;
     }
     catch (e) {
+        console.log(e);
         return false;
     }
 });
@@ -10197,6 +10207,15 @@ exports.default = (bucketName, uploadDirectory, environmentPrefix) => __awaiter(
                         ObjectOwnership: 'ObjectWriter'
                     }
                 ]
+            }
+        }).promise();
+        yield s3Client_1.default.putPublicAccessBlock({
+            Bucket: bucketName,
+            PublicAccessBlockConfiguration: {
+                BlockPublicAcls: false,
+                BlockPublicPolicy: false,
+                IgnorePublicAcls: false,
+                RestrictPublicBuckets: false
             }
         }).promise();
         console.log('Configuring bucket website...');
@@ -26359,7 +26378,7 @@ exports.default = (bucketName, directory) => __awaiter(void 0, void 0, void 0, f
         try {
             const fileBuffer = yield fs_1.promises.readFile(filePath);
             const mimeType = mime_types_1.default.lookup(filePath) || 'application/octet-stream';
-            yield s3Client_1.default.putObject({
+            const response = yield s3Client_1.default.putObject({
                 Bucket: bucketName,
                 Key: s3Key,
                 Body: fileBuffer,
@@ -26367,8 +26386,10 @@ exports.default = (bucketName, directory) => __awaiter(void 0, void 0, void 0, f
                 ServerSideEncryption: 'AES256',
                 ContentType: mimeType
             }).promise();
+            console.log({ response });
         }
         catch (e) {
+            console.log(e);
             const message = `Failed to upload ${s3Key}: ${e.code} - ${e.message}`;
             console.log(message);
             throw message;

@@ -5,6 +5,7 @@ export default async (bucketName: string) => {
 		await S3.headBucket({ Bucket: bucketName }).promise()
 		return true
 	} catch (e) {
+		console.log(e)
 		return false
 	}
 }

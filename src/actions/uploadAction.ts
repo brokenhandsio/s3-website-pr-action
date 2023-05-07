@@ -35,6 +35,16 @@ export default async (bucketName: string, uploadDirectory: string, environmentPr
 			}
 		}).promise()
 
+		await S3.putPublicAccessBlock({
+			Bucket: bucketName,
+			PublicAccessBlockConfiguration: {
+				BlockPublicAcls: false,
+				BlockPublicPolicy: false,
+				IgnorePublicAcls: false,
+				RestrictPublicBuckets: false
+			}
+		}).promise()
+
 		console.log('Configuring bucket website...')
 		await S3.putBucketWebsite({
 			Bucket: bucketName,
