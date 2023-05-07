@@ -23,7 +23,7 @@ export default async (bucketName: string, uploadDirectory: string, environmentPr
 
 	if (!bucketExists) {
 		console.log(`S3 bucket does not exist. Creating ${bucketName}...`)
-		await S3.createBucket({ Bucket: bucketName, ObjectOwnership: 'ObjectWriter' }).promise()
+		await S3.createBucket({ Bucket: bucketName }).promise()
 
 		await S3.putBucketOwnershipControls({
 			Bucket: bucketName,
@@ -33,6 +33,16 @@ export default async (bucketName: string, uploadDirectory: string, environmentPr
 						ObjectOwnership: 'ObjectWriter'
 					}
 				]
+			}
+		}).promise()
+
+		await S3.putPublicAccessBlock({
+			Bucket: bucketName,
+			PublicAccessBlockConfiguration: {
+				BlockPublicAcls: false,
+				BlockPublicPolicy: false,
+				IgnorePublicAcls: false,
+				RestrictPublicBuckets: false
 			}
 		}).promise()
 
