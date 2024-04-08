@@ -8,6 +8,7 @@ import dayjs from 'dayjs'
 const main = async () => {
 	try {
 		const bucketPrefix = core.getInput('bucket-prefix')
+		const bucketRegion = core.getInput('bucket-region')
 		const folderToCopy = core.getInput('folder-to-copy')
 		const environmentPrefix = core.getInput('environment-prefix')
 
@@ -16,14 +17,14 @@ const main = async () => {
 			const prNumber = github.context.payload.pull_request!.number
 			const bucketName = `${bucketPrefix}-pr-${prNumber}`
 
-			console.log(`Bucket Name: ${bucketName}`)
+			console.log(`Bucket Name: ${bucketName} in region: ${bucketRegion}`)
 
 			const githubActionType = github.context.payload.action
 			switch (githubActionType) {
 				case 'opened':
 				case 'reopened':
 				case 'synchronize':
-					await prUpdatedAction(bucketName, folderToCopy, environmentPrefix)
+					await prUpdatedAction(bucketName, bucketRegion, folderToCopy, environmentPrefix)
 					break
 
 				case 'closed':
@@ -37,7 +38,7 @@ const main = async () => {
 		} else {
 			const bucketName = `${bucketPrefix}-${dayjs().format('DD-MM-YYYY-hh-mma')}`
 
-			await uploadAction(bucketName, folderToCopy, environmentPrefix)
+			await uploadAction(bucketName, bucketRegion, folderToCopy, environmentPrefix)
 		}
 	} catch (error) {
 		console.log(error)

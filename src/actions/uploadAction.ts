@@ -11,8 +11,8 @@ import dayjs from 'dayjs'
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
 
-export default async (bucketName: string, uploadDirectory: string, environmentPrefix: string) => {
-	const websiteUrl = `https://s3.amazonaws.com/${bucketName}/index.html`
+export default async (bucketName: string, bucketRegion: string, uploadDirectory: string, environmentPrefix: string) => {
+	const websiteUrl = `http://${bucketName}.s3-website.${bucketRegion}.amazonaws.com/`
 	const { repo } = github.context
 	const branchName = github.context.ref
 
