@@ -6,10 +6,15 @@ import validateEnvVars from '../utils/validateEnvVars'
 import checkBucketExists from '../utils/checkBucketExists'
 import githubClient from '../githubClient'
 import deactivateDeployments from '../utils/deactivateDeployments'
-import { ReposCreateDeploymentResponseData } from '@octokit/types'
-import dayjs from 'dayjs'
+import {
+	GetResponseDataTypeFromEndpointMethod,
+} from "@octokit/types";import dayjs from 'dayjs'
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
+
+type ReposCreateDeploymentResponseData = GetResponseDataTypeFromEndpointMethod<
+  typeof githubClient.rest.repos.createDeployment
+>;
 
 export default async (bucketName: string, bucketRegion: string, uploadDirectory: string, environmentPrefix: string) => {
 	const websiteUrl = `http://${bucketName}.s3-website.${bucketRegion}.amazonaws.com/`
@@ -59,7 +64,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 
 	await deactivateDeployments(repo, environmentPrefix)
 
-	const deployment = await githubClient.repos.createDeployment({
+	const deployment = await githubClient.rest.repos.createDeployment({
 		...repo,
 		ref: `${branchName}`,
 		environment: `${environmentPrefix || 'ACTION-'}${dayjs().format('DD-MM-YYYY-hh:mma')}`,
@@ -69,7 +74,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 	})
 
 	if (isSuccessResponse(deployment.data)) {
-		await githubClient.repos.createDeploymentStatus({
+		await githubClient.rest.repos.createDeploymentStatus({
 			...repo,
 			deployment_id: deployment.data.id,
 			state: 'in_progress'
@@ -78,7 +83,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 		console.log('Uploading files...')
 		await s3UploadDirectory(bucketName, uploadDirectory)
 
-		await githubClient.repos.createDeploymentStatus({
+		await githubClient.rest.repos.createDeploymentStatus({
 			...repo,
 			deployment_id: deployment.data.id,
 			state: 'success',
