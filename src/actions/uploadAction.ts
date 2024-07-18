@@ -76,7 +76,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 	if (isSuccessResponse(deployment.data)) {
 		await githubClient.rest.repos.createDeploymentStatus({
 			...repo,
-			deployment_id: deployment.data.id,
+			deployment_id: (deployment.data as any).id,
 			state: 'in_progress'
 		})
 
@@ -85,7 +85,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 
 		await githubClient.rest.repos.createDeploymentStatus({
 			...repo,
-			deployment_id: deployment.data.id,
+			deployment_id: (deployment.data as any).id,
 			state: 'success',
 			environment_url: websiteUrl
 		})
