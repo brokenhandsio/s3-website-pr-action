@@ -6,7 +6,7 @@
 
 # Usage 📝
 
-See [s3-website-pr-action-example](https://github.com/danburtenshaw/s3-website-pr-action-example) for an example application using [create-react-app](https://github.com/facebook/create-react-app).
+See [Vapor's Website](https://github.com/vapor/wesbite) for an example application using this action.
 
 ## PR opened or updated:
 
@@ -15,30 +15,31 @@ name: PR
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 build:
   runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Yarn Install and Build
+      - name: Create Site
         run: |
-          yarn install
-          yarn build
+          swift build
 
       - name: Deploy S3 Website
-        uses: danburtenshaw/s3-website-pr-action@v2
-        with:
-          bucket-prefix: "example-app"
-          folder-to-copy: "./dist"
+        uses: brokenhandsio/s3-website-https-pr-action@v2
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          bucket-prefix: "vapor-website-pulls"
+          folder-to-copy: "./Output"
+          bucket-region: "eu-west-2"
 ```
+
 Execute the `s3-website-pr-action` action on pull request `opened`, `synchronize` and `reopened` events. This will create a new S3 static site and upload the contents of `folder-to-copy`. 
-The site url will be posted as a comment on the pull request.  
+The site url will be posted as a deployment on the pull request.  
 
 Note: By default, workflows using the `pull_request` activity type will include the above events. [Docs](https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request)
 
@@ -54,6 +55,7 @@ Note: By default, workflows using the `pull_request` activity type will include 
 | -------------- | --------------------------------------------------------------------- |
 | bucket-prefix  | Prefix to the S3 bucket name                                          |
 | folder-to-copy | The directory to your built web app. This folder will be copied to S3 |
+| bucket-region  | Region to deploy the S3 bucket into                                   |
 
 ### Optional Parameters
 | Parameter          | Description                                        |
@@ -68,21 +70,23 @@ name: PR - Closed
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     types: [ closed ]
 
 build:
   runs-on: ubuntu-latest
   steps:
     - name: Delete Website Bucket
-      uses: danburtenshaw/s3-website-pr-action@v2
-      with:
-        bucket-prefix: "example-app"
+        uses: brokenhandsio/s3-website-https-pr-action@v2
+        with:
+          bucket-prefix: "vapor-website-pulls"
+          bucket-region: "eu-west-2"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
 Execute the `s3-website-pr-action` action on pull request `closed` events. This will remove the S3 bucket that was created in the previous stage.
 
 ### Required Environment Variables
@@ -96,6 +100,7 @@ Execute the `s3-website-pr-action` action on pull request `closed` events. This 
 | Parameter     | Description                                                                    |
 | ------------- | ------------------------------------------------------------------------------ |
 | bucket-prefix | Prefix to the S3 bucket name. This should be the same value as the other stage |
+| bucket-region  | Region to deploy the S3 bucket into                                           |
 
 ### Optional Parameters
 | Parameter          | Description                                        |
@@ -115,7 +120,6 @@ Replace `<YOUR_BUCKET_PREFIX>` with the same `bucket-prefix` value that you defi
         {
             "Effect": "Allow",
             "Action": [
-                "s3:HeadBucket",
                 "s3:CreateBucket",
                 "s3:DeleteBucket",
                 "s3:GetObject",
