@@ -20,14 +20,16 @@ export default async (bucketName: string, directory: string) => {
 			try {
 				const fileBuffer = await fs.readFile(filePath)
 				const mimeType = mimeTypes.lookup(filePath) || 'application/octet-stream'
+				let acl = 'public-read' as const;
+				let sse = 'AES256' as const;
 
 				const input = {
-					"Bucket": bucketName,
-					"Key": s3Key,
-					"Body": fileBuffer,
-					"ACL": 'public-read',
-					"ServerSideEncryption": 'AES256',
-					"ContentType": mimeType
+					Bucket: bucketName,
+					Key: s3Key,
+					Body: fileBuffer,
+					ACL: acl,
+					ServerSideEncryption: sse,
+					ContentType: mimeType
 				}
 
 				const command = new PutObjectCommand(input)
