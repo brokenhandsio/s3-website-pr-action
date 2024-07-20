@@ -9,6 +9,7 @@ import deactivateDeployments from '../utils/deactivateDeployments'
 import {
 	GetResponseDataTypeFromEndpointMethod,
   } from "@octokit/types";
+import { CreateBucketRequest, CreateBucketCommand, PutBucketOwnershipControlsCommand, PutBucketOwnershipControlsRequest, PutPublicAccessBlockCommand, PutBucketWebsiteCommand } from "@aws-sdk/client-s3";
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
 
@@ -29,9 +30,15 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 
 	if (!bucketExists) {
 		console.log(`S3 bucket does not exist. Creating ${bucketName}...`)
-		await S3.createBucket({ Bucket: bucketName }).promise()
 
-		await S3.putBucketOwnershipControls({
+		const createBucketRequest: CreateBucketRequest = {
+			Bucket: bucketName,
+			ObjectOwnership: 'ObjectWriter'
+		}
+		const createBucketCommand = new CreateBucketCommand(createBucketRequest)
+		await S3.send(createBucketCommand)
+
+		const putBucketOwnershipControlsRequest: PutBucketOwnershipControlsRequest = {
 			Bucket: bucketName,
 			OwnershipControls: {
 				Rules: [
@@ -40,9 +47,11 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 					}
 				]
 			}
-		}).promise()
+		}
+		const putBucketOwnershipControlsCommand = new PutBucketOwnershipControlsCommand(putBucketOwnershipControlsRequest)
+		await S3.send(putBucketOwnershipControlsCommand)
 
-		await S3.putPublicAccessBlock({
+		const putPublicAccessBlockRequest = {
 			Bucket: bucketName,
 			PublicAccessBlockConfiguration: {
 				BlockPublicAcls: false,
@@ -50,16 +59,21 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 				IgnorePublicAcls: false,
 				RestrictPublicBuckets: false
 			}
-		}).promise()
+		}
+
+		const putPublicAccessBlockCommand = new PutPublicAccessBlockCommand(putPublicAccessBlockRequest)
+		await S3.send(putPublicAccessBlockCommand)
 
 		console.log('Configuring bucket website...')
-		await S3.putBucketWebsite({
+		const putBucketWebsiteRequest = {
 			Bucket: bucketName,
 			WebsiteConfiguration: {
 				IndexDocument: { Suffix: 'index.html' },
 				ErrorDocument: { Key: 'index.html' }
 			}
-		}).promise()
+		}
+		const putBucketWebsiteCommand = new PutBucketWebsiteCommand(putBucketWebsiteRequest)
+		await S3.send(putBucketWebsiteCommand)
 	} else {
 		console.log('S3 Bucket already exists. Skipping creation...')
 	}

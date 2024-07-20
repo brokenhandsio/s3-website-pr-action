@@ -4,6 +4,7 @@ import { DeleteObjectsRequest } from 'aws-sdk/clients/s3'
 import validateEnvVars from '../utils/validateEnvVars'
 import deactivateDeployments from '../utils/deactivateDeployments'
 import deleteDeployments from '../utils/deleteDeployments'
+import { DeleteBucketCommand } from '@aws-sdk/client-s3'
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
 
@@ -35,7 +36,11 @@ export default async (bucketName: string, environmentPrefix: string) => {
 		console.log('S3 bucket already empty.')
 	}
 
-	await S3.deleteBucket({ Bucket: bucketName }).promise()
+	const deleteBucketRequest = {
+		Bucket: bucketName
+	}
+	const deleteBucketCommand = new DeleteBucketCommand(deleteBucketRequest)
+	await S3.send(deleteBucketCommand)
 
 	await deactivateDeployments(repo, environmentPrefix)
 	await deleteDeployments(repo, environmentPrefix)
