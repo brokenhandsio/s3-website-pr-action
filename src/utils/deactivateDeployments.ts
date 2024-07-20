@@ -15,7 +15,7 @@ export default async (
 			? `${environmentPrefix || 'PR-'}${github.context.payload.pull_request!.number}`
 			: `${environmentPrefix || 'ACTION-'}${dayjs().format('DD-MM-YYYY-hh:mma')}`
 
-	const deployments = await githubClient.repos.listDeployments({
+	const deployments = await githubClient.rest.repos.listDeployments({
 		repo: repo.repo,
 		owner: repo.owner,
 		environment
@@ -30,7 +30,7 @@ export default async (
 	for (const deployment of deployments.data) {
 		console.log(`Deactivating existing deployment - ${deployment.id}`)
 
-		await githubClient.repos.createDeploymentStatus({
+		await githubClient.rest.repos.createDeploymentStatus({
 			...repo,
 			deployment_id: deployment.id,
 			state: 'inactive'

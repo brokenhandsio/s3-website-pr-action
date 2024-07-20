@@ -6,10 +6,16 @@ import validateEnvVars from '../utils/validateEnvVars'
 import checkBucketExists from '../utils/checkBucketExists'
 import githubClient from '../githubClient'
 import deactivateDeployments from '../utils/deactivateDeployments'
-import { ReposCreateDeploymentResponseData } from '@octokit/types'
-import dayjs from 'dayjs'
+import {
+	GetResponseDataTypeFromEndpointMethod,
+} from "@octokit/types";import dayjs from 'dayjs'
+import { CreateBucketRequest, CreateBucketCommand, PutBucketOwnershipControlsCommand, PutBucketOwnershipControlsRequest, PutPublicAccessBlockCommand, PutBucketWebsiteCommand } from "@aws-sdk/client-s3";
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
+
+type ReposCreateDeploymentResponseData = GetResponseDataTypeFromEndpointMethod<
+  typeof githubClient.rest.repos.createDeployment
+>;
 
 export default async (bucketName: string, bucketRegion: string, uploadDirectory: string, environmentPrefix: string) => {
 	const websiteUrl = `http://${bucketName}.s3-website.${bucketRegion}.amazonaws.com/`
@@ -22,9 +28,16 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 
 	if (!bucketExists) {
 		console.log(`S3 bucket does not exist. Creating ${bucketName}...`)
-		await S3.createBucket({ Bucket: bucketName }).promise()
 
-		await S3.putBucketOwnershipControls({
+		const createBucketRequest: CreateBucketRequest = {
+			Bucket: bucketName,
+			ObjectOwnership: 'ObjectWriter'
+		}
+
+		const createBucketCommand = new CreateBucketCommand(createBucketRequest)
+		await S3.send(createBucketCommand)
+
+		const putBucketOwnershipControlsRequest: PutBucketOwnershipControlsRequest = {
 			Bucket: bucketName,
 			OwnershipControls: {
 				Rules: [
@@ -33,9 +46,11 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 					}
 				]
 			}
-		}).promise()
+		}
+		const putBucketOwnershipControlsCommand = new PutBucketOwnershipControlsCommand(putBucketOwnershipControlsRequest)
+		await S3.send(putBucketOwnershipControlsCommand)
 
-		await S3.putPublicAccessBlock({
+		const putPublicAccessBlockRequest = {
 			Bucket: bucketName,
 			PublicAccessBlockConfiguration: {
 				BlockPublicAcls: false,
@@ -43,23 +58,27 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 				IgnorePublicAcls: false,
 				RestrictPublicBuckets: false
 			}
-		}).promise()
+		}
 
-		console.log('Configuring bucket website...')
-		await S3.putBucketWebsite({
+		const putPublicAccessBlockCommand = new PutPublicAccessBlockCommand(putPublicAccessBlockRequest)
+		await S3.send(putPublicAccessBlockCommand)
+
+		const putBucketWebsiteRequest = {
 			Bucket: bucketName,
 			WebsiteConfiguration: {
 				IndexDocument: { Suffix: 'index.html' },
 				ErrorDocument: { Key: 'index.html' }
 			}
-		}).promise()
+		}
+		const putBucketWebsiteCommand = new PutBucketWebsiteCommand(putBucketWebsiteRequest)
+		await S3.send(putBucketWebsiteCommand)
 	} else {
 		console.log('S3 Bucket already exists. Skipping creation...')
 	}
 
 	await deactivateDeployments(repo, environmentPrefix)
 
-	const deployment = await githubClient.repos.createDeployment({
+	const deployment = await githubClient.rest.repos.createDeployment({
 		...repo,
 		ref: `${branchName}`,
 		environment: `${environmentPrefix || 'ACTION-'}${dayjs().format('DD-MM-YYYY-hh:mma')}`,
@@ -69,18 +88,18 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 	})
 
 	if (isSuccessResponse(deployment.data)) {
-		await githubClient.repos.createDeploymentStatus({
+		await githubClient.rest.repos.createDeploymentStatus({
 			...repo,
-			deployment_id: deployment.data.id,
+			deployment_id: (deployment.data as any).id,
 			state: 'in_progress'
 		})
 
 		console.log('Uploading files...')
 		await s3UploadDirectory(bucketName, uploadDirectory)
 
-		await githubClient.repos.createDeploymentStatus({
+		await githubClient.rest.repos.createDeploymentStatus({
 			...repo,
-			deployment_id: deployment.data.id,
+			deployment_id: (deployment.data as any).id,
 			state: 'success',
 			environment_url: websiteUrl
 		})

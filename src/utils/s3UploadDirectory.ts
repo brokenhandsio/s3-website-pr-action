@@ -4,6 +4,7 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import filePathToS3Key from './filePathToS3Key'
 import mimeTypes from 'mime-types'
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 
 export default async (bucketName: string, directory: string) => {
 	const normalizedPath = path.normalize(directory)
@@ -19,15 +20,20 @@ export default async (bucketName: string, directory: string) => {
 			try {
 				const fileBuffer = await fs.readFile(filePath)
 				const mimeType = mimeTypes.lookup(filePath) || 'application/octet-stream'
+				let acl = 'public-read' as const;
+				let sse = 'AES256' as const;
 
-				const response = await S3.putObject({
+				const input = {
 					Bucket: bucketName,
 					Key: s3Key,
 					Body: fileBuffer,
-					ACL: 'public-read',
-					ServerSideEncryption: 'AES256',
+					ACL: acl,
+					ServerSideEncryption: sse,
 					ContentType: mimeType
-				}).promise()
+				}
+
+				const command = new PutObjectCommand(input)
+				const response = await S3.send(command)
 
 				console.log({ response })
 			} catch (e) {

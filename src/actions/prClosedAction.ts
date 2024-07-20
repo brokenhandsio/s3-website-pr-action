@@ -1,9 +1,9 @@
 import * as github from '@actions/github'
 import S3 from '../s3Client'
-import { DeleteObjectsRequest } from 'aws-sdk/clients/s3'
 import validateEnvVars from '../utils/validateEnvVars'
 import deactivateDeployments from '../utils/deactivateDeployments'
 import deleteDeployments from '../utils/deleteDeployments'
+import { DeleteBucketCommand, ListObjectsV2Command, DeleteObjectsCommand, ObjectIdentifier } from '@aws-sdk/client-s3'
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
 
@@ -15,27 +15,38 @@ export default async (bucketName: string, environmentPrefix: string) => {
 	console.log('Emptying S3 bucket...')
 
 	console.log('Fetching objects...')
-	const objects = await S3.listObjectsV2({ Bucket: bucketName }).promise()
+
+	const listObjectsRequest = {
+		Bucket: bucketName
+	}
+	const listObjectsCommand = new ListObjectsV2Command(listObjectsRequest)
+	const objects = await S3.send(listObjectsCommand)
 
 	if (objects.Contents && objects.Contents.length >= 1) {
-		const deleteParams: DeleteObjectsRequest = {
+
+		const deleteObjectsRequest = {
 			Bucket: bucketName,
 			Delete: {
-				Objects: []
+				Objects: [] as Array<ObjectIdentifier>
 			}
 		}
 
 		for (const object of objects.Contents) {
-			deleteParams.Delete.Objects.push({ Key: object.Key })
+			deleteObjectsRequest.Delete.Objects.push({ Key: object.Key })
 		}
 
 		console.log('Deleting objects...')
-		await S3.deleteObjects(deleteParams).promise()
+		const deleteObjectsCommand = new DeleteObjectsCommand(deleteObjectsRequest)
+		await S3.send(deleteObjectsCommand)
 	} else {
 		console.log('S3 bucket already empty.')
 	}
 
-	await S3.deleteBucket({ Bucket: bucketName }).promise()
+	const deleteBucketRequest = {
+		Bucket: bucketName
+	}
+	const deleteBucketCommand = new DeleteBucketCommand(deleteBucketRequest)
+	await S3.send(deleteBucketCommand)
 
 	await deactivateDeployments(repo, environmentPrefix)
 	await deleteDeployments(repo, environmentPrefix)
