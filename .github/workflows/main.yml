@@ -2,7 +2,7 @@ name: Main Workflow
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build-test:
@@ -10,17 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js for use with actions
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 12.x
-
-      - name: Yarn Install and Build
+          node-version: 20.x
+          cache: "npm"
+        
+      - name: Build
         run: |
-          yarn install
-          yarn build
+          npm install
+          ncc build src/index.ts
 
-      - name: Jest Test
-        run: yarn test
+      - name: Test
+        run: npm test
