@@ -1,5 +1,6 @@
-name: "S3 Website HTTPS PR"
-description: "Automatically deploy built PR bundles to an S3 static website."
+name: "Deploy PRs to S3"
+author: "Broken Hands"
+description: "Automatically deploy built PR bundles to an S3 static website and set up deployments for each PR."
 branding:
   icon: "cloud"
   color: "orange"
