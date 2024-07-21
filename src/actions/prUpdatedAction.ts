@@ -8,8 +8,8 @@ import githubClient from '../githubClient'
 import deactivateDeployments from '../utils/deactivateDeployments'
 import {
 	GetResponseDataTypeFromEndpointMethod,
-  } from "@octokit/types";
-import { CreateBucketRequest, CreateBucketCommand, PutBucketOwnershipControlsCommand, PutBucketOwnershipControlsRequest, PutPublicAccessBlockCommand, PutBucketWebsiteCommand } from "@aws-sdk/client-s3";
+  } from '@octokit/types';
+import { CreateBucketRequest, CreateBucketCommand, PutBucketOwnershipControlsCommand, PutBucketOwnershipControlsRequest, PutPublicAccessBlockCommand, PutBucketWebsiteCommand } from '@aws-sdk/client-s3';
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
 
