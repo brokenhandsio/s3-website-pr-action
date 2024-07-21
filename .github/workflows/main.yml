@@ -21,7 +21,7 @@ jobs:
       - name: Build
         run: |
           npm install
-          ncc build src/index.ts
+          npm run build
 
       - name: Test
         run: npm test
