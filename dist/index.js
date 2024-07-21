@@ -64545,8 +64545,8 @@ exports["default"] = (bucketName, directory) => __awaiter(void 0, void 0, void 0
         try {
             const fileBuffer = yield fs_1.promises.readFile(filePath);
             const mimeType = mime_types_1.default.lookup(filePath) || 'application/octet-stream';
-            let acl = 'public-read';
-            let sse = 'AES256';
+            const acl = 'public-read';
+            const sse = 'AES256';
             const input = {
                 Bucket: bucketName,
                 Key: s3Key,
