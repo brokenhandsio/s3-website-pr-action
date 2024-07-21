@@ -27,7 +27,7 @@ build:
           swift build
 
       - name: Deploy S3 Website
-        uses: brokenhandsio/s3-website-https-pr-action@v2
+        uses: brokenhandsio/s3-website-pr-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -77,7 +77,7 @@ build:
   runs-on: ubuntu-latest
   steps:
     - name: Delete Website Bucket
-        uses: brokenhandsio/s3-website-https-pr-action@v2
+        uses: brokenhandsio/s3-website-pr-action@v2
         with:
           bucket-prefix: "vapor-website-pulls"
           bucket-region: "eu-west-2"
