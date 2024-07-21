@@ -4,7 +4,7 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import filePathToS3Key from './filePathToS3Key'
 import mimeTypes from 'mime-types'
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 
 export default async (bucketName: string, directory: string) => {
 	const normalizedPath = path.normalize(directory)
@@ -20,8 +20,8 @@ export default async (bucketName: string, directory: string) => {
 			try {
 				const fileBuffer = await fs.readFile(filePath)
 				const mimeType = mimeTypes.lookup(filePath) || 'application/octet-stream'
-				let acl = 'public-read' as const;
-				let sse = 'AES256' as const;
+				const acl = 'public-read' as const;
+				const sse = 'AES256' as const;
 
 				const input = {
 					Bucket: bucketName,
