@@ -17,6 +17,12 @@ inputs:
   environment-prefix:
     description: "Prefix of the GitHub Deployment Environment. The PR number will be appended to this value."
     required: false
+  index-document:
+    description: "Index document for the S3 bucket. Defaults to index.html."
+    required: false
+  error-document:
+    description: "Error document for the S3 bucket. Defaults to error.html."
+    required: false
 runs:
   using: "node20"
   main: "dist/index.js"
