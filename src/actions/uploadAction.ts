@@ -8,16 +8,17 @@ import githubClient from '../githubClient'
 import deactivateDeployments from '../utils/deactivateDeployments'
 import {
 	GetResponseDataTypeFromEndpointMethod,
-} from '@octokit/types';import dayjs from 'dayjs'
+} from '@octokit/types';
+import dayjs from 'dayjs'
 import { CreateBucketRequest, CreateBucketCommand, PutBucketOwnershipControlsCommand, PutBucketOwnershipControlsRequest, PutPublicAccessBlockCommand, PutBucketWebsiteCommand } from '@aws-sdk/client-s3';
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
 
 type ReposCreateDeploymentResponseData = GetResponseDataTypeFromEndpointMethod<
-  typeof githubClient.rest.repos.createDeployment
+	typeof githubClient.rest.repos.createDeployment
 >;
 
-export default async (bucketName: string, bucketRegion: string, uploadDirectory: string, environmentPrefix: string) => {
+export default async (bucketName: string, bucketRegion: string, uploadDirectory: string, environmentPrefix: string, indexDocument: string, errorDocument: string) => {
 	const websiteUrl = `http://${bucketName}.s3-website.${bucketRegion}.amazonaws.com/`
 	const { repo } = github.context
 	const branchName = github.context.ref
@@ -66,8 +67,8 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 		const putBucketWebsiteRequest = {
 			Bucket: bucketName,
 			WebsiteConfiguration: {
-				IndexDocument: { Suffix: 'index.html' },
-				ErrorDocument: { Key: 'index.html' }
+				IndexDocument: { Suffix: indexDocument },
+				ErrorDocument: { Key: errorDocument }
 			}
 		}
 		const putBucketWebsiteCommand = new PutBucketWebsiteCommand(putBucketWebsiteRequest)

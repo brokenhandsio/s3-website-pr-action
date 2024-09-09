@@ -63977,7 +63977,7 @@ const githubClient_1 = __importDefault(__nccwpck_require__(261));
 const deactivateDeployments_1 = __importDefault(__nccwpck_require__(5066));
 const client_s3_1 = __nccwpck_require__(9250);
 exports.requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN'];
-exports["default"] = (bucketName, bucketRegion, uploadDirectory, environmentPrefix) => __awaiter(void 0, void 0, void 0, function* () {
+exports["default"] = (bucketName, bucketRegion, uploadDirectory, environmentPrefix, indexDocument, errorDocument) => __awaiter(void 0, void 0, void 0, function* () {
     const websiteUrl = `http://${bucketName}.s3-website.${bucketRegion}.amazonaws.com/`;
     const { repo } = github.context;
     const branchName = github.context.payload.pull_request.head.ref;
@@ -64019,8 +64019,8 @@ exports["default"] = (bucketName, bucketRegion, uploadDirectory, environmentPref
         const putBucketWebsiteRequest = {
             Bucket: bucketName,
             WebsiteConfiguration: {
-                IndexDocument: { Suffix: 'index.html' },
-                ErrorDocument: { Key: 'index.html' }
+                IndexDocument: { Suffix: indexDocument },
+                ErrorDocument: { Key: errorDocument }
             }
         };
         const putBucketWebsiteCommand = new client_s3_1.PutBucketWebsiteCommand(putBucketWebsiteRequest);
@@ -64100,7 +64100,7 @@ const deactivateDeployments_1 = __importDefault(__nccwpck_require__(5066));
 const dayjs_1 = __importDefault(__nccwpck_require__(7401));
 const client_s3_1 = __nccwpck_require__(9250);
 exports.requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN'];
-exports["default"] = (bucketName, bucketRegion, uploadDirectory, environmentPrefix) => __awaiter(void 0, void 0, void 0, function* () {
+exports["default"] = (bucketName, bucketRegion, uploadDirectory, environmentPrefix, indexDocument, errorDocument) => __awaiter(void 0, void 0, void 0, function* () {
     const websiteUrl = `http://${bucketName}.s3-website.${bucketRegion}.amazonaws.com/`;
     const { repo } = github.context;
     const branchName = github.context.ref;
@@ -64140,8 +64140,8 @@ exports["default"] = (bucketName, bucketRegion, uploadDirectory, environmentPref
         const putBucketWebsiteRequest = {
             Bucket: bucketName,
             WebsiteConfiguration: {
-                IndexDocument: { Suffix: 'index.html' },
-                ErrorDocument: { Key: 'index.html' }
+                IndexDocument: { Suffix: indexDocument },
+                ErrorDocument: { Key: errorDocument }
             }
         };
         const putBucketWebsiteCommand = new client_s3_1.PutBucketWebsiteCommand(putBucketWebsiteRequest);
@@ -64252,11 +64252,14 @@ const prUpdatedAction_1 = __importDefault(__nccwpck_require__(8092));
 const uploadAction_1 = __importDefault(__nccwpck_require__(9695));
 const dayjs_1 = __importDefault(__nccwpck_require__(7401));
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     try {
         const bucketPrefix = core.getInput('bucket-prefix');
         const bucketRegion = core.getInput('bucket-region');
         const folderToCopy = core.getInput('folder-to-copy');
         const environmentPrefix = core.getInput('environment-prefix');
+        const indexDocument = (_a = core.getInput('index-document')) !== null && _a !== void 0 ? _a : 'index.html';
+        const errorDocument = (_b = core.getInput('error-document')) !== null && _b !== void 0 ? _b : 'error.html';
         const githubEventName = github.context.eventName;
         if (githubEventName === 'pull_request') {
             const prNumber = github.context.payload.pull_request.number;
@@ -64267,7 +64270,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 case 'opened':
                 case 'reopened':
                 case 'synchronize':
-                    yield (0, prUpdatedAction_1.default)(bucketName, bucketRegion, folderToCopy, environmentPrefix);
+                    yield (0, prUpdatedAction_1.default)(bucketName, bucketRegion, folderToCopy, environmentPrefix, indexDocument, errorDocument);
                     break;
                 case 'closed':
                     yield (0, prClosedAction_1.default)(bucketName, environmentPrefix);
@@ -64279,7 +64282,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         }
         else {
             const bucketName = `${bucketPrefix}-${(0, dayjs_1.default)().format('DD-MM-YYYY-hh-mma')}`;
-            yield (0, uploadAction_1.default)(bucketName, bucketRegion, folderToCopy, environmentPrefix);
+            yield (0, uploadAction_1.default)(bucketName, bucketRegion, folderToCopy, environmentPrefix, indexDocument, errorDocument);
         }
     }
     catch (error) {

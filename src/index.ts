@@ -11,6 +11,8 @@ const main = async () => {
 		const bucketRegion = core.getInput('bucket-region')
 		const folderToCopy = core.getInput('folder-to-copy')
 		const environmentPrefix = core.getInput('environment-prefix')
+		const indexDocument = core.getInput('index-document') ?? 'index.html'
+		const errorDocument = core.getInput('error-document') ?? 'error.html'
 
 		const githubEventName = github.context.eventName
 		if (githubEventName === 'pull_request') {
@@ -24,7 +26,7 @@ const main = async () => {
 				case 'opened':
 				case 'reopened':
 				case 'synchronize':
-					await prUpdatedAction(bucketName, bucketRegion, folderToCopy, environmentPrefix)
+					await prUpdatedAction(bucketName, bucketRegion, folderToCopy, environmentPrefix, indexDocument, errorDocument)
 					break
 
 				case 'closed':
@@ -38,7 +40,7 @@ const main = async () => {
 		} else {
 			const bucketName = `${bucketPrefix}-${dayjs().format('DD-MM-YYYY-hh-mma')}`
 
-			await uploadAction(bucketName, bucketRegion, folderToCopy, environmentPrefix)
+			await uploadAction(bucketName, bucketRegion, folderToCopy, environmentPrefix, indexDocument, errorDocument)
 		}
 	} catch (error) {
 		console.log(error)
