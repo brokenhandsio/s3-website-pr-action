@@ -106,6 +106,9 @@ Execute the `s3-website-pr-action` action on pull request `closed` events. This 
 | Parameter          | Description                                        |
 | ------------------ | -------------------------------------------------- |
 | environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-' |
+| folder-to-copy     | The directory to your built web app. This folder will be copied to S3 |
+| index-document     | The index document for the S3 bucket. Defaults to 'index.html' |
+| error-document     | The error document for the S3 bucket. Defaults to 'error.html' |
 
 # IAM 🔐
 
