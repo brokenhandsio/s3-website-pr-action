@@ -25,7 +25,7 @@
 		"@types/node": "^22.8.1",
 		"@types/recursive-readdir": "^2.2.0",
 		"@typescript-eslint/eslint-plugin": "^8.12.2",
-		"@typescript-eslint/parser": "^8.10.0",
+		"@typescript-eslint/parser": "^8.12.2",
 		"@vercel/ncc": "latest",
 		"eslint": "^9.13.0",
 		"eslint-config-prettier": "^9.1.0",
