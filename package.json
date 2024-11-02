@@ -20,7 +20,7 @@
 		"recursive-readdir": "^2.2.2"
 	},
 	"devDependencies": {
-		"@types/jest": "^29.5.13",
+		"@types/jest": "^29.5.14",
 		"@types/mime-types": "^2.1.0",
 		"@types/node": "^22.8.1",
 		"@types/recursive-readdir": "^2.2.0",
