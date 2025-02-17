@@ -14,7 +14,7 @@
 		"@actions/core": "^1.2.6",
 		"@actions/github": "^6.0.0",
 		"@octokit/types": "^13.8.0",
-		"@aws-sdk/client-s3": "^3.744.0",
+		"@aws-sdk/client-s3": "^3.749.0",
 		"dayjs": "^1.11.13",
 		"mime-types": "^2.1.27",
 		"recursive-readdir": "^2.2.2"
