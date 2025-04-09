@@ -24,7 +24,7 @@
 		"@types/mime-types": "^2.1.0",
 		"@types/node": "^22.13.16",
 		"@types/recursive-readdir": "^2.2.0",
-		"@typescript-eslint/eslint-plugin": "^8.28.0",
+		"@typescript-eslint/eslint-plugin": "^8.29.1",
 		"@typescript-eslint/parser": "^8.29.1",
 		"@vercel/ncc": "latest",
 		"eslint": "^9.23.0",
