@@ -22,7 +22,7 @@
 	"devDependencies": {
 		"@types/jest": "^29.5.14",
 		"@types/mime-types": "^3.0.1",
-		"@types/node": "^22.15.29",
+		"@types/node": "^24.0.1",
 		"@types/recursive-readdir": "^2.2.0",
 		"@typescript-eslint/eslint-plugin": "^8.33.1",
 		"@typescript-eslint/parser": "^8.32.1",
