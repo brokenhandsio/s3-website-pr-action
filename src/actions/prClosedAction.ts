@@ -1,5 +1,5 @@
 import * as github from '@actions/github'
-import S3 from '../s3Client'
+import { getS3Client } from '../s3Client'
 import validateEnvVars from '../utils/validateEnvVars'
 import deactivateDeployments from '../utils/deactivateDeployments'
 import deleteDeployments from '../utils/deleteDeployments'
@@ -20,7 +20,7 @@ export default async (bucketName: string, environmentPrefix: string) => {
 		Bucket: bucketName
 	}
 	const listObjectsCommand = new ListObjectsV2Command(listObjectsRequest)
-	const objects = await S3.send(listObjectsCommand)
+	const objects = await getS3Client().send(listObjectsCommand)
 
 	if (objects.Contents && objects.Contents.length >= 1) {
 
@@ -37,7 +37,7 @@ export default async (bucketName: string, environmentPrefix: string) => {
 
 		console.log('Deleting objects...')
 		const deleteObjectsCommand = new DeleteObjectsCommand(deleteObjectsRequest)
-		await S3.send(deleteObjectsCommand)
+		await getS3Client().send(deleteObjectsCommand)
 	} else {
 		console.log('S3 bucket already empty.')
 	}
@@ -46,7 +46,7 @@ export default async (bucketName: string, environmentPrefix: string) => {
 		Bucket: bucketName
 	}
 	const deleteBucketCommand = new DeleteBucketCommand(deleteBucketRequest)
-	await S3.send(deleteBucketCommand)
+	await getS3Client().send(deleteBucketCommand)
 
 	await deactivateDeployments(repo, environmentPrefix)
 	await deleteDeployments(repo, environmentPrefix)

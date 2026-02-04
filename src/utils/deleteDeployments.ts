@@ -1,5 +1,5 @@
 import * as github from '@actions/github'
-import githubClient from '../githubClient'
+import { getGithubClient } from '../githubClient'
 import dayjs from 'dayjs'
 
 export default async (
@@ -15,7 +15,7 @@ export default async (
 			? `${environmentPrefix || 'PR-'}${github.context.payload.pull_request!.number}`
 			: `${environmentPrefix || 'ACTION-'}${dayjs().format('DD-MM-YYYY-hh:mma')}`
 
-	const deployments = await githubClient.rest.repos.listDeployments({
+	const deployments = await getGithubClient().rest.repos.listDeployments({
 		...repo,
 		environment: environment,
 		per_page: 100
@@ -31,7 +31,7 @@ export default async (
 	for (const deployment of deployments.data) {
 		console.log(`Deleting existing deployment - ${deployment.id}`)
 
-		await githubClient.rest.repos.deleteDeployment({
+		await getGithubClient().rest.repos.deleteDeployment({
 			...repo,
 			deployment_id: deployment.id
 		})

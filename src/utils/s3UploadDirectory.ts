@@ -1,4 +1,4 @@
-import S3 from '../s3Client'
+import { getS3Client } from '../s3Client'
 import readdir from 'recursive-readdir'
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -33,7 +33,7 @@ export default async (bucketName: string, directory: string) => {
 				}
 
 				const command = new PutObjectCommand(input)
-				const response = await S3.send(command)
+				const response = await getS3Client().send(command)
 
 				console.log({ response })
 			} catch (e) {

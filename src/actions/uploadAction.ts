@@ -1,22 +1,15 @@
 import * as github from '@actions/github'
 import * as githubCore from '@actions/core'
-import S3 from '../s3Client'
+import { getS3Client } from '../s3Client'
 import s3UploadDirectory from '../utils/s3UploadDirectory'
 import validateEnvVars from '../utils/validateEnvVars'
 import checkBucketExists from '../utils/checkBucketExists'
-import githubClient from '../githubClient'
+import { getGithubClient } from '../githubClient'
 import deactivateDeployments from '../utils/deactivateDeployments'
-import {
-	GetResponseDataTypeFromEndpointMethod,
-} from '@octokit/types';
 import dayjs from 'dayjs'
 import { CreateBucketRequest, CreateBucketCommand, PutBucketOwnershipControlsCommand, PutBucketOwnershipControlsRequest, PutPublicAccessBlockCommand, PutBucketWebsiteCommand } from '@aws-sdk/client-s3';
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
-
-type ReposCreateDeploymentResponseData = GetResponseDataTypeFromEndpointMethod<
-	typeof githubClient.rest.repos.createDeployment
->;
 
 export default async (bucketName: string, bucketRegion: string, uploadDirectory: string, environmentPrefix: string, indexDocument: string, errorDocument: string) => {
 	const websiteUrl = `http://${bucketName}.s3-website.${bucketRegion}.amazonaws.com/`
@@ -36,7 +29,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 		}
 
 		const createBucketCommand = new CreateBucketCommand(createBucketRequest)
-		await S3.send(createBucketCommand)
+		await getS3Client().send(createBucketCommand)
 
 		const putBucketOwnershipControlsRequest: PutBucketOwnershipControlsRequest = {
 			Bucket: bucketName,
@@ -49,7 +42,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 			}
 		}
 		const putBucketOwnershipControlsCommand = new PutBucketOwnershipControlsCommand(putBucketOwnershipControlsRequest)
-		await S3.send(putBucketOwnershipControlsCommand)
+		await getS3Client().send(putBucketOwnershipControlsCommand)
 
 		const putPublicAccessBlockRequest = {
 			Bucket: bucketName,
@@ -62,7 +55,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 		}
 
 		const putPublicAccessBlockCommand = new PutPublicAccessBlockCommand(putPublicAccessBlockRequest)
-		await S3.send(putPublicAccessBlockCommand)
+		await getS3Client().send(putPublicAccessBlockCommand)
 
 		const putBucketWebsiteRequest = {
 			Bucket: bucketName,
@@ -72,14 +65,14 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 			}
 		}
 		const putBucketWebsiteCommand = new PutBucketWebsiteCommand(putBucketWebsiteRequest)
-		await S3.send(putBucketWebsiteCommand)
+		await getS3Client().send(putBucketWebsiteCommand)
 	} else {
 		console.log('S3 Bucket already exists. Skipping creation...')
 	}
 
 	await deactivateDeployments(repo, environmentPrefix)
 
-	const deployment = await githubClient.rest.repos.createDeployment({
+	const deployment = await getGithubClient().rest.repos.createDeployment({
 		...repo,
 		ref: `${branchName}`,
 		environment: `${environmentPrefix || 'ACTION-'}${dayjs().format('DD-MM-YYYY-hh:mma')}`,
@@ -89,7 +82,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 	})
 
 	if (isSuccessResponse(deployment.data)) {
-		await githubClient.rest.repos.createDeploymentStatus({
+		await getGithubClient().rest.repos.createDeploymentStatus({
 			...repo,
 			deployment_id: (deployment.data as any).id,
 			state: 'in_progress'
@@ -98,7 +91,7 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 		console.log('Uploading files...')
 		await s3UploadDirectory(bucketName, uploadDirectory)
 
-		await githubClient.rest.repos.createDeploymentStatus({
+		await getGithubClient().rest.repos.createDeploymentStatus({
 			...repo,
 			deployment_id: (deployment.data as any).id,
 			state: 'success',
@@ -111,6 +104,6 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 	}
 }
 
-function isSuccessResponse(object: any): object is ReposCreateDeploymentResponseData {
+function isSuccessResponse(object: any): object is { id: number } {
 	return 'id' in object
 }
