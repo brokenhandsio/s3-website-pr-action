@@ -19,7 +19,7 @@ permissions:
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 build:
   runs-on: ubuntu-latest
@@ -48,7 +48,7 @@ name: PR
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   id-token: write
@@ -87,12 +87,13 @@ build:
         bucket-region: "eu-west-2"
 ```
 
-Execute the `s3-website-pr-action` action on pull request `opened`, `synchronize` and `reopened` events. This will create a new S3 static site and upload the contents of `folder-to-copy`. 
-The site url will be posted as a deployment on the pull request.  
+Execute the `s3-website-pr-action` action on pull request `opened`, `synchronize` and `reopened` events. This will create a new S3 static site and upload the contents of `folder-to-copy`.
+The site url will be posted as a deployment on the pull request.
 
 Note: By default, workflows using the `pull_request` activity type will include the above events. [Docs](https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request)
 
 ### Required Environment Variables
+
 | Environment Variable  | Description                                    |
 | --------------------- | ---------------------------------------------- |
 | AWS_ACCESS_KEY_ID     | AWS Access Key ID of an IAM user               |
@@ -103,6 +104,7 @@ Note: By default, workflows using the `pull_request` activity type will include 
 > The `GITHUB_TOKEN` environment variable is not required if you provide the `token` input to the action instead. This is most useful when used in conjunction with the [GitHub OIDC provider](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services).
 
 ### Required Parameters
+
 | Parameter      | Description                                                           |
 | -------------- | --------------------------------------------------------------------- |
 | bucket-prefix  | Prefix to the S3 bucket name                                          |
@@ -110,6 +112,7 @@ Note: By default, workflows using the `pull_request` activity type will include 
 | bucket-region  | Region to deploy the S3 bucket into                                   |
 
 ### Optional Parameters
+
 | Parameter          | Description                                                                     |
 | ------------------ | ------------------------------------------------------------------------------- |
 | environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-'                              |
@@ -142,6 +145,7 @@ build:
 Execute the `s3-website-pr-action` action on pull request `closed` events. This will remove the S3 bucket that was created in the previous stage.
 
 ### Required Environment Variables
+
 | Environment Variable  | Description                                    |
 | --------------------- | ---------------------------------------------- |
 | AWS_ACCESS_KEY_ID     | AWS Access Key ID of an IAM user               |
@@ -152,18 +156,20 @@ Execute the `s3-website-pr-action` action on pull request `closed` events. This 
 > The `GITHUB_TOKEN` environment variable is not required if you provide the `token` input to the action instead. This is most useful when used in conjunction with the [GitHub OIDC provider](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services).
 
 ### Required Parameters
+
 | Parameter     | Description                                                                    |
 | ------------- | ------------------------------------------------------------------------------ |
 | bucket-prefix | Prefix to the S3 bucket name. This should be the same value as the other stage |
-| bucket-region  | Region to deploy the S3 bucket into                                           |
+| bucket-region | Region to deploy the S3 bucket into                                            |
 
 ### Optional Parameters
-| Parameter          | Description                                        |
-| ------------------ | -------------------------------------------------- |
-| environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-' |
-| folder-to-copy     | The directory to your built web app. This folder will be copied to S3 |
-| index-document     | The index document for the S3 bucket. Defaults to 'index.html' |
-| error-document     | The error document for the S3 bucket. Defaults to 'error.html' |
+
+| Parameter          | Description                                                                     |
+| ------------------ | ------------------------------------------------------------------------------- |
+| environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-'                              |
+| folder-to-copy     | The directory to your built web app. This folder will be copied to S3           |
+| index-document     | The index document for the S3 bucket. Defaults to 'index.html'                  |
+| error-document     | The error document for the S3 bucket. Defaults to 'error.html'                  |
 | token              | A GitHub access token to use. Overrides GITHUB_TOKEN environment var if present |
 
 # IAM 🔐
@@ -174,25 +180,23 @@ Replace `<YOUR_BUCKET_PREFIX>` with the same `bucket-prefix` value that you defi
 
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:CreateBucket",
-                "s3:DeleteBucket",
-                "s3:GetObject",
-                "s3:PutObject",
-                "s3:DeleteObject",
-                "s3:PutBucketWebsite",
-                "s3:PutObjectAcl",
-                "s3:ListBucket"
-            ],
-            "Resource": [
-                "arn:aws:s3:::<YOUR_BUCKET_PREFIX>-*",
-            ]
-        }
-    ]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:PutBucketWebsite",
+        "s3:PutObjectAcl",
+        "s3:ListBucket"
+      ],
+      "Resource": ["arn:aws:s3:::<YOUR_BUCKET_PREFIX>-*"]
+    }
+  ]
 }
 ```
 

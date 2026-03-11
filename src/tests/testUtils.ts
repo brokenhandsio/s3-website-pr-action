@@ -73,10 +73,12 @@ export function createMockGithubContext(options: {
 		eventName,
 		payload: {
 			action,
-			pull_request: prNumber ? {
-				number: prNumber,
-				head: { ref }
-			} : undefined
+			pull_request: prNumber
+				? {
+						number: prNumber,
+						head: { ref }
+					}
+				: undefined
 		},
 		repo: { owner, repo },
 		ref: `refs/heads/${ref}`

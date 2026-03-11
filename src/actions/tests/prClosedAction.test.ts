@@ -6,11 +6,11 @@ import * as github from '@actions/github'
 
 // Override context for these tests
 beforeAll(() => {
-	(github.context as any).eventName = 'pull_request';
-	(github.context as any).payload = {
+	;(github.context as any).eventName = 'pull_request'
+	;(github.context as any).payload = {
 		pull_request: { number: 42 }
-	};
-	(github.context as any).repo = {
+	}
+	;(github.context as any).repo = {
 		owner: 'test-owner',
 		repo: 'test-repo'
 	}
@@ -31,7 +31,9 @@ describe('prClosedAction', () => {
 		setGithubClient(mockGithubClient)
 
 		// Default mock responses
-		mockGithubClient.rest.repos.listDeployments.mockResolvedValue({ data: [] })
+		mockGithubClient.rest.repos.listDeployments.mockResolvedValue({
+			data: []
+		})
 	})
 
 	afterEach(() => {
@@ -42,10 +44,7 @@ describe('prClosedAction', () => {
 
 	test('should delete objects from bucket when objects exist', async () => {
 		mockS3Client.send.mockResolvedValueOnce({
-			Contents: [
-				{ Key: 'file1.html' },
-				{ Key: 'file2.css' }
-			]
+			Contents: [{ Key: 'file1.html' }, { Key: 'file2.css' }]
 		})
 		mockS3Client.send.mockResolvedValue({})
 

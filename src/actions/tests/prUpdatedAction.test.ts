@@ -15,14 +15,14 @@ const mockCheckBucketExists = checkBucketExists as jest.MockedFunction<typeof ch
 
 // Override context for these tests
 beforeAll(() => {
-	(github.context as any).eventName = 'pull_request';
-	(github.context as any).payload = {
+	;(github.context as any).eventName = 'pull_request'
+	;(github.context as any).payload = {
 		pull_request: {
 			number: 42,
 			head: { ref: 'feature-branch' }
 		}
-	};
-	(github.context as any).repo = {
+	}
+	;(github.context as any).repo = {
 		owner: 'test-owner',
 		repo: 'test-repo'
 	}
@@ -45,7 +45,9 @@ describe('prUpdatedAction', () => {
 
 		// Default mock responses
 		mockS3Client.send.mockResolvedValue({})
-		mockGithubClient.rest.repos.listDeployments.mockResolvedValue({ data: [] })
+		mockGithubClient.rest.repos.listDeployments.mockResolvedValue({
+			data: []
+		})
 		mockGithubClient.rest.repos.createDeployment.mockResolvedValue({
 			data: { id: 456 }
 		})
@@ -185,14 +187,7 @@ describe('prUpdatedAction', () => {
 	test('should configure website with custom index and error documents', async () => {
 		mockCheckBucketExists.mockResolvedValueOnce(false)
 
-		await prUpdatedAction(
-			'test-bucket',
-			'us-east-1',
-			'./dist',
-			'PR-',
-			'home.html',
-			'404.html'
-		)
+		await prUpdatedAction('test-bucket', 'us-east-1', './dist', 'PR-', 'home.html', '404.html')
 
 		// Last S3 call should be PutBucketWebsiteCommand
 		const websiteCall = mockS3Client.send.mock.calls[3][0]

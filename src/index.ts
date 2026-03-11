@@ -32,7 +32,14 @@ const main = async () => {
 				case 'opened':
 				case 'reopened':
 				case 'synchronize':
-					await prUpdatedAction(bucketName, bucketRegion, folderToCopy, environmentPrefix, indexDocument, errorDocument)
+					await prUpdatedAction(
+						bucketName,
+						bucketRegion,
+						folderToCopy,
+						environmentPrefix,
+						indexDocument,
+						errorDocument
+					)
 					break
 
 				case 'closed':
@@ -46,7 +53,14 @@ const main = async () => {
 		} else {
 			const bucketName = `${bucketPrefix}-${dayjs().format('DD-MM-YYYY-hh-mma')}`
 
-			await uploadAction(bucketName, bucketRegion, folderToCopy, environmentPrefix, indexDocument, errorDocument)
+			await uploadAction(
+				bucketName,
+				bucketRegion,
+				folderToCopy,
+				environmentPrefix,
+				indexDocument,
+				errorDocument
+			)
 		}
 	} catch (error: any) {
 		console.log(error)

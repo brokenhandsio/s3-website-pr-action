@@ -6,8 +6,8 @@ import * as github from '@actions/github'
 
 // Override context for these tests
 beforeAll(() => {
-	(github.context as any).eventName = 'pull_request';
-	(github.context as any).payload = {
+	;(github.context as any).eventName = 'pull_request'
+	;(github.context as any).payload = {
 		pull_request: { number: 42 }
 	}
 })
@@ -28,10 +28,7 @@ describe('deleteDeployments', () => {
 
 	test('should delete existing deployments', async () => {
 		mockGithubClient.rest.repos.listDeployments.mockResolvedValueOnce({
-			data: [
-				{ id: 1 },
-				{ id: 2 }
-			]
+			data: [{ id: 1 }, { id: 2 }]
 		})
 		mockGithubClient.rest.repos.deleteDeployment.mockResolvedValue({})
 
