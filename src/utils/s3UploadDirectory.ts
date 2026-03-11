@@ -36,7 +36,7 @@ export default async (bucketName: string, directory: string) => {
 				const response = await getS3Client().send(command)
 
 				console.log({ response })
-			} catch (e) {
+			} catch (e: any) {
 				console.log(e)
 				const message = `Failed to upload ${s3Key}: ${e.code} - ${e.message}`
 				console.log(message)

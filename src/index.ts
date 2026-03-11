@@ -48,7 +48,7 @@ const main = async () => {
 
 			await uploadAction(bucketName, bucketRegion, folderToCopy, environmentPrefix, indexDocument, errorDocument)
 		}
-	} catch (error) {
+	} catch (error: any) {
 		console.log(error)
 		core.setFailed(error)
 	}

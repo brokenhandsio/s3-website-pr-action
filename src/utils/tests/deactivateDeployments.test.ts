@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { setGithubClient, resetGithubClient } from '../../githubClient'
 import deactivateDeployments from '../deactivateDeployments'
 import { createMockGithubClient } from '../../tests/testUtils'

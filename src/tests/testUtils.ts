@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 // Types for mock clients
 export type MockS3Client = {
 	send: jest.Mock
