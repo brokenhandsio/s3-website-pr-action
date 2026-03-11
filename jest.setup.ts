@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 // Mock @actions/core
 jest.mock(
 	'@actions/core',
