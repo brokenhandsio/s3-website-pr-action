@@ -13,6 +13,12 @@ const main = async () => {
 		const environmentPrefix = core.getInput('environment-prefix')
 		const indexDocument = core.getInput('index-document') ?? 'index.html'
 		const errorDocument = core.getInput('error-document') ?? 'error.html'
+		const tokenFromInput = core.getInput('token')
+
+		if (tokenFromInput) {
+			// If a nonempty token was provided as an input, it overrides the env var
+			process.env.GITHUB_TOKEN = tokenFromInput
+		}
 
 		const githubEventName = github.context.eventName
 		if (githubEventName === 'pull_request') {
@@ -26,7 +32,14 @@ const main = async () => {
 				case 'opened':
 				case 'reopened':
 				case 'synchronize':
-					await prUpdatedAction(bucketName, bucketRegion, folderToCopy, environmentPrefix, indexDocument, errorDocument)
+					await prUpdatedAction(
+						bucketName,
+						bucketRegion,
+						folderToCopy,
+						environmentPrefix,
+						indexDocument,
+						errorDocument
+					)
 					break
 
 				case 'closed':
@@ -40,9 +53,16 @@ const main = async () => {
 		} else {
 			const bucketName = `${bucketPrefix}-${dayjs().format('DD-MM-YYYY-hh-mma')}`
 
-			await uploadAction(bucketName, bucketRegion, folderToCopy, environmentPrefix, indexDocument, errorDocument)
+			await uploadAction(
+				bucketName,
+				bucketRegion,
+				folderToCopy,
+				environmentPrefix,
+				indexDocument,
+				errorDocument
+			)
 		}
-	} catch (error) {
+	} catch (error: any) {
 		console.log(error)
 		core.setFailed(error)
 	}

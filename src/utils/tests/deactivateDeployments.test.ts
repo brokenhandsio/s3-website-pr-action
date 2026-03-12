@@ -1,3 +1,4 @@
+import { jest, afterEach, beforeAll, beforeEach, describe, test, expect } from '@jest/globals'
 import { setGithubClient, resetGithubClient } from '../../githubClient'
 import deactivateDeployments from '../deactivateDeployments'
 import { createMockGithubClient } from '../../tests/testUtils'
@@ -5,8 +6,8 @@ import * as github from '@actions/github'
 
 // Override context for these tests
 beforeAll(() => {
-	(github.context as any).eventName = 'pull_request';
-	(github.context as any).payload = {
+	;(github.context as any).eventName = 'pull_request'
+	;(github.context as any).payload = {
 		pull_request: { number: 42 }
 	}
 })
@@ -27,10 +28,7 @@ describe('deactivateDeployments', () => {
 
 	test('should deactivate existing deployments', async () => {
 		mockGithubClient.rest.repos.listDeployments.mockResolvedValueOnce({
-			data: [
-				{ id: 1 },
-				{ id: 2 }
-			]
+			data: [{ id: 1 }, { id: 2 }] as any
 		})
 		mockGithubClient.rest.repos.createDeploymentStatus.mockResolvedValue({})
 

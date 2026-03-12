@@ -19,7 +19,7 @@ export default async (
 		...repo,
 		environment: environment,
 		per_page: 100
-	});
+	})
 
 	console.log(JSON.stringify(deployments))
 

@@ -10,7 +10,9 @@ export function getGithubClient(): GithubClient {
 		if (!GITHUB_TOKEN) {
 			throw new Error('GITHUB_TOKEN environment variable is required')
 		}
-		githubClient = github.getOctokit(GITHUB_TOKEN, { previews: ['ant-man-preview', 'flash-preview'] })
+		githubClient = github.getOctokit(GITHUB_TOKEN, {
+			previews: ['ant-man-preview', 'flash-preview']
+		})
 	}
 	return githubClient
 }

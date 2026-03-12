@@ -23,6 +23,9 @@ inputs:
   error-document:
     description: "Error document for the S3 bucket. Defaults to error.html."
     required: false
+  token:
+    description: "Access token used to crete and manage deployments. If both this input and the GITHUB_TOKEN environment variable are provided, this input takes precedence."
+    required: false
 runs:
-  using: "node20"
+  using: "node24"
   main: "dist/index.js"

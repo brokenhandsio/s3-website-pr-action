@@ -7,5 +7,15 @@ module.exports = {
 	useTabs: true,
 	bracketSpacing: true,
 	bracketSameLine: true,
-	singleQuote: true
+	singleQuote: true,
+	overrides: [
+		{
+			files: ['*.yml', '*.md'],
+			options: {
+				tabWidth: 2,
+				useTabs: false,
+				singleQuote: false
+			}
+		}
+	]
 }

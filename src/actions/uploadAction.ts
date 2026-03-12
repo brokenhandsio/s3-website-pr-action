@@ -7,11 +7,25 @@ import checkBucketExists from '../utils/checkBucketExists'
 import { getGithubClient } from '../githubClient'
 import deactivateDeployments from '../utils/deactivateDeployments'
 import dayjs from 'dayjs'
-import { CreateBucketRequest, CreateBucketCommand, PutBucketOwnershipControlsCommand, PutBucketOwnershipControlsRequest, PutPublicAccessBlockCommand, PutBucketWebsiteCommand } from '@aws-sdk/client-s3';
+import {
+	CreateBucketRequest,
+	CreateBucketCommand,
+	PutBucketOwnershipControlsCommand,
+	PutBucketOwnershipControlsRequest,
+	PutPublicAccessBlockCommand,
+	PutBucketWebsiteCommand
+} from '@aws-sdk/client-s3'
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'GITHUB_TOKEN']
 
-export default async (bucketName: string, bucketRegion: string, uploadDirectory: string, environmentPrefix: string, indexDocument: string, errorDocument: string) => {
+export default async (
+	bucketName: string,
+	bucketRegion: string,
+	uploadDirectory: string,
+	environmentPrefix: string,
+	indexDocument: string,
+	errorDocument: string
+) => {
 	const websiteUrl = `http://${bucketName}.s3-website.${bucketRegion}.amazonaws.com/`
 	const { repo } = github.context
 	const branchName = github.context.ref
@@ -41,7 +55,9 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 				]
 			}
 		}
-		const putBucketOwnershipControlsCommand = new PutBucketOwnershipControlsCommand(putBucketOwnershipControlsRequest)
+		const putBucketOwnershipControlsCommand = new PutBucketOwnershipControlsCommand(
+			putBucketOwnershipControlsRequest
+		)
 		await getS3Client().send(putBucketOwnershipControlsCommand)
 
 		const putPublicAccessBlockRequest = {
@@ -54,7 +70,9 @@ export default async (bucketName: string, bucketRegion: string, uploadDirectory:
 			}
 		}
 
-		const putPublicAccessBlockCommand = new PutPublicAccessBlockCommand(putPublicAccessBlockRequest)
+		const putPublicAccessBlockCommand = new PutPublicAccessBlockCommand(
+			putPublicAccessBlockRequest
+		)
 		await getS3Client().send(putPublicAccessBlockCommand)
 
 		const putBucketWebsiteRequest = {

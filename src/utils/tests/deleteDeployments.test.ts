@@ -1,3 +1,4 @@
+import { jest, afterEach, beforeAll, beforeEach, describe, test, expect } from '@jest/globals'
 import { setGithubClient, resetGithubClient } from '../../githubClient'
 import deleteDeployments from '../deleteDeployments'
 import { createMockGithubClient } from '../../tests/testUtils'
@@ -5,8 +6,8 @@ import * as github from '@actions/github'
 
 // Override context for these tests
 beforeAll(() => {
-	(github.context as any).eventName = 'pull_request';
-	(github.context as any).payload = {
+	;(github.context as any).eventName = 'pull_request'
+	;(github.context as any).payload = {
 		pull_request: { number: 42 }
 	}
 })
@@ -27,10 +28,7 @@ describe('deleteDeployments', () => {
 
 	test('should delete existing deployments', async () => {
 		mockGithubClient.rest.repos.listDeployments.mockResolvedValueOnce({
-			data: [
-				{ id: 1 },
-				{ id: 2 }
-			]
+			data: [{ id: 1 }, { id: 2 }] as any
 		})
 		mockGithubClient.rest.repos.deleteDeployment.mockResolvedValue({})
 
@@ -53,9 +51,7 @@ describe('deleteDeployments', () => {
 	})
 
 	test('should handle no existing deployments', async () => {
-		mockGithubClient.rest.repos.listDeployments.mockResolvedValueOnce({
-			data: []
-		})
+		mockGithubClient.rest.repos.listDeployments.mockResolvedValueOnce({ data: [] })
 
 		await deleteDeployments(repo, 'PR-')
 
@@ -64,9 +60,7 @@ describe('deleteDeployments', () => {
 	})
 
 	test('should use default environment prefix when not provided', async () => {
-		mockGithubClient.rest.repos.listDeployments.mockResolvedValueOnce({
-			data: []
-		})
+		mockGithubClient.rest.repos.listDeployments.mockResolvedValueOnce({ data: [] })
 
 		await deleteDeployments(repo, '')
 

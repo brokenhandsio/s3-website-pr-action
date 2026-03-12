@@ -1,3 +1,4 @@
+import { describe, test, expect } from '@jest/globals'
 import validateEnvVars from '../validateEnvVars'
 
 process.env.ENV_VAR_1 = 'Hello'
