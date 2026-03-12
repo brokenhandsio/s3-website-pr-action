@@ -1,18 +1,21 @@
-import { setS3Client, resetS3Client } from '../../s3Client'
-import { setGithubClient, resetGithubClient } from '../../githubClient'
-import prClosedAction from '../prClosedAction'
-import { createMockS3Client, createMockGithubClient } from '../../tests/testUtils'
 import * as github from '@actions/github'
+import prClosedAction from '../prClosedAction'
+import { resetGithubClient, setGithubClient } from '../../githubClient'
+import { resetS3Client, setS3Client } from '../../s3Client'
+import { createMockGithubClient, createMockS3Client } from '../../tests/testUtils'
+import { afterEach, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals'
+import type {
+	DeleteObjectsCommandInput,
+	ListObjectsCommandInput,
+	DeleteBucketCommandInput
+} from '@aws-sdk/client-s3'
 
 // Override context for these tests
 beforeAll(() => {
 	;(github.context as any).eventName = 'pull_request'
 	;(github.context as any).payload = {
-		pull_request: { number: 42 }
-	}
-	;(github.context as any).repo = {
-		owner: 'test-owner',
-		repo: 'test-repo'
+		pull_request: { number: 42 },
+		repository: { owner: { login: 'test-owner' }, name: 'test-repo' }
 	}
 })
 
@@ -55,8 +58,8 @@ describe('prClosedAction', () => {
 
 		// Second call: DeleteObjectsCommand
 		const deleteCall = mockS3Client.send.mock.calls[1][0]
-		expect(deleteCall.input.Bucket).toBe('test-bucket')
-		expect(deleteCall.input.Delete.Objects).toEqual([
+		expect((deleteCall.input as ListObjectsCommandInput).Bucket).toBe('test-bucket')
+		expect((deleteCall.input as DeleteObjectsCommandInput).Delete?.Objects).toEqual([
 			{ Key: 'file1.html' },
 			{ Key: 'file2.css' }
 		])
@@ -81,17 +84,17 @@ describe('prClosedAction', () => {
 		await prClosedAction('test-bucket', 'PR-')
 
 		const deleteBucketCall = mockS3Client.send.mock.calls[1][0]
-		expect(deleteBucketCall.input.Bucket).toBe('test-bucket')
+		expect((deleteBucketCall.input as DeleteBucketCommandInput).Bucket).toBe('test-bucket')
 	})
 
 	test('should deactivate and delete deployments', async () => {
 		mockS3Client.send.mockResolvedValueOnce({ Contents: [] })
 		mockS3Client.send.mockResolvedValue({})
 		mockGithubClient.rest.repos.listDeployments.mockResolvedValue({
-			data: [{ id: 123 }]
+			data: [{ id: 123 }] as any
 		})
-		mockGithubClient.rest.repos.createDeploymentStatus.mockResolvedValue({})
-		mockGithubClient.rest.repos.deleteDeployment.mockResolvedValue({})
+		mockGithubClient.rest.repos.createDeploymentStatus.mockResolvedValue({ data: [] as any })
+		mockGithubClient.rest.repos.deleteDeployment.mockResolvedValue({ data: [] as any })
 
 		await prClosedAction('test-bucket', 'PR-')
 

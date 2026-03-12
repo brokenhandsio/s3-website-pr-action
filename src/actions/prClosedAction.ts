@@ -7,7 +7,7 @@ import {
 	DeleteBucketCommand,
 	ListObjectsV2Command,
 	DeleteObjectsCommand,
-	ObjectIdentifier
+	type ObjectIdentifier
 } from '@aws-sdk/client-s3'
 
 export const requiredEnvVars = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']

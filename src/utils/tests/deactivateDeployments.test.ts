@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals'
+import { jest, afterEach, beforeAll, beforeEach, describe, test, expect } from '@jest/globals'
 import { setGithubClient, resetGithubClient } from '../../githubClient'
 import deactivateDeployments from '../deactivateDeployments'
 import { createMockGithubClient } from '../../tests/testUtils'
@@ -28,7 +28,7 @@ describe('deactivateDeployments', () => {
 
 	test('should deactivate existing deployments', async () => {
 		mockGithubClient.rest.repos.listDeployments.mockResolvedValueOnce({
-			data: [{ id: 1 }, { id: 2 }]
+			data: [{ id: 1 }, { id: 2 }] as any
 		})
 		mockGithubClient.rest.repos.createDeploymentStatus.mockResolvedValue({})
 

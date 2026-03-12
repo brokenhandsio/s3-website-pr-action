@@ -7,10 +7,10 @@ import checkBucketExists from '../utils/checkBucketExists'
 import { getGithubClient } from '../githubClient'
 import deactivateDeployments from '../utils/deactivateDeployments'
 import {
-	CreateBucketRequest,
+	type CreateBucketRequest,
 	CreateBucketCommand,
 	PutBucketOwnershipControlsCommand,
-	PutBucketOwnershipControlsRequest,
+	type PutBucketOwnershipControlsRequest,
 	PutPublicAccessBlockCommand,
 	PutBucketWebsiteCommand
 } from '@aws-sdk/client-s3'
