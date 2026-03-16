@@ -14,23 +14,23 @@ inputs:
   folder-to-copy:
     description: "Folder to copy assets from into S3."
     required: false
-    default: ''
+    default: ""
   environment-prefix:
     description: "Prefix of the GitHub Deployment Environment. The PR number will be appended to this value."
     required: false
-    default: ''
+    default: ""
   index-document:
     description: "Index document for the S3 bucket. Defaults to index.html."
     required: false
-    default: 'index.html'
+    default: "index.html"
   error-document:
     description: "Error document for the S3 bucket. Defaults to error.html."
     required: false
-    default: 'error.html'
+    default: "error.html"
   token:
     description: "Access token used to crete and manage deployments. If both this input and the GITHUB_TOKEN environment variable are provided, this input takes precedence."
     required: false
-    default: ''
+    default: ""
 runs:
   using: "node24"
   main: "dist/index.js"
