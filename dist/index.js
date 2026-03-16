@@ -27979,6 +27979,12 @@ var ExitCode;
  */
 function getInput(name, options) {
     const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
+    if (options && options.required && !val) {
+        throw new Error(`Input required and not supplied: ${name}`);
+    }
+    if (options && options.trimWhitespace === false) {
+        return val;
+    }
     return val.trim();
 }
 /**
@@ -62923,12 +62929,12 @@ function isSuccessResponse(object) {
 
 const main = async () => {
     try {
-        const bucketPrefix = getInput('bucket-prefix');
-        const bucketRegion = getInput('bucket-region');
+        const bucketPrefix = getInput('bucket-prefix', { required: true });
+        const bucketRegion = getInput('bucket-region', { required: true });
         const folderToCopy = getInput('folder-to-copy');
         const environmentPrefix = getInput('environment-prefix');
-        const indexDocument = getInput('index-document') ?? 'index.html';
-        const errorDocument = getInput('error-document') ?? 'error.html';
+        const indexDocument = getInput('index-document') || 'index.html';
+        const errorDocument = getInput('error-document') || 'error.html';
         const tokenFromInput = getInput('token');
         if (tokenFromInput) {
             process.env.GITHUB_TOKEN = tokenFromInput;
