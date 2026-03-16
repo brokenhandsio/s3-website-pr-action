@@ -7,12 +7,12 @@ import dayjs from 'dayjs'
 
 const main = async () => {
 	try {
-		const bucketPrefix = core.getInput('bucket-prefix')
-		const bucketRegion = core.getInput('bucket-region')
+		const bucketPrefix = core.getInput('bucket-prefix', { required: true })
+		const bucketRegion = core.getInput('bucket-region', { required: true })
 		const folderToCopy = core.getInput('folder-to-copy')
 		const environmentPrefix = core.getInput('environment-prefix')
-		const indexDocument = core.getInput('index-document') ?? 'index.html'
-		const errorDocument = core.getInput('error-document') ?? 'error.html'
+		const indexDocument = core.getInput('index-document') || 'index.html'
+		const errorDocument = core.getInput('error-document') || 'error.html'
 		const tokenFromInput = core.getInput('token')
 
 		if (tokenFromInput) {
