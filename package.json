@@ -34,7 +34,7 @@
 		"@types/mime-types": "^3.0.1",
 		"@types/node": "^25.5.0",
 		"@types/recursive-readdir": "^2.2.4",
-		"eslint": "^10.1.0",
+		"eslint": "^10.2.0",
 		"eslint-config-prettier": "^10.1.8",
 		"globals": "^17.4.0",
 		"jest": "^30.3.0",
