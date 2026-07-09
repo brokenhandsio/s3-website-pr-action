@@ -4,7 +4,6 @@ import { resetGithubClient, setGithubClient } from '../../githubClient'
 import { resetS3Client, setS3Client } from '../../s3Client'
 import { createMockGithubClient, createMockS3Client } from '../../tests/testUtils'
 import { afterEach, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals'
-import { ListObjectsV2Command } from '@aws-sdk/client-s3'
 import type {
 	DeleteObjectsCommandInput,
 	ListObjectsCommandInput,
@@ -68,25 +67,20 @@ describe('prClosedAction', () => {
 	})
 
 	test('should page through and delete objects when the listing is truncated', async () => {
-		// Drive responses by command type: the ...Once queue can't be used here
-		// because it advances on every send() call (lists *and* deletes) in order.
-		const listPages = [
-			{
+		// send() is called in a fixed order: list page 1, delete page 1,
+		// list page 2, delete page 2, delete bucket.
+		mockS3Client.send
+			.mockResolvedValueOnce({
 				Contents: [{ Key: 'file1.html' }, { Key: 'file2.css' }],
 				IsTruncated: true,
 				NextContinuationToken: 'token-1'
-			},
-			{
+			})
+			.mockResolvedValueOnce({}) // delete page 1
+			.mockResolvedValueOnce({
 				Contents: [{ Key: 'file3.js' }],
 				IsTruncated: false
-			}
-		]
-		mockS3Client.send.mockImplementation(((command: any) => {
-			if (command instanceof ListObjectsV2Command) {
-				return Promise.resolve(listPages.shift() ?? {})
-			}
-			return Promise.resolve({})
-		}) as any)
+			})
+		mockS3Client.send.mockResolvedValue({}) // delete page 2, delete bucket
 
 		await prClosedAction('test-bucket', 'PR-')
 
