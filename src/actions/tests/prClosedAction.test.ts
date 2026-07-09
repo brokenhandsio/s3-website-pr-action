@@ -4,9 +4,11 @@ import { resetGithubClient, setGithubClient } from '../../githubClient'
 import { resetS3Client, setS3Client } from '../../s3Client'
 import { createMockGithubClient, createMockS3Client } from '../../tests/testUtils'
 import { afterEach, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { ListObjectsV2Command } from '@aws-sdk/client-s3'
 import type {
 	DeleteObjectsCommandInput,
 	ListObjectsCommandInput,
+	ListObjectsV2CommandInput,
 	DeleteBucketCommandInput
 } from '@aws-sdk/client-s3'
 
@@ -65,6 +67,48 @@ describe('prClosedAction', () => {
 		])
 	})
 
+	test('should page through and delete objects when the listing is truncated', async () => {
+		// Drive responses by command type: the ...Once queue can't be used here
+		// because it advances on every send() call (lists *and* deletes) in order.
+		const listPages = [
+			{
+				Contents: [{ Key: 'file1.html' }, { Key: 'file2.css' }],
+				IsTruncated: true,
+				NextContinuationToken: 'token-1'
+			},
+			{
+				Contents: [{ Key: 'file3.js' }],
+				IsTruncated: false
+			}
+		]
+		mockS3Client.send.mockImplementation(((command: any) => {
+			if (command instanceof ListObjectsV2Command) {
+				return Promise.resolve(listPages.shift() ?? {})
+			}
+			return Promise.resolve({})
+		}) as any)
+
+		await prClosedAction('test-bucket', 'PR-')
+
+		// List page 1, Delete page 1, List page 2, Delete page 2, DeleteBucket
+		expect(mockS3Client.send).toHaveBeenCalledTimes(5)
+
+		// The second list call must forward the continuation token
+		const secondListCall = mockS3Client.send.mock.calls[2][0]
+		expect((secondListCall.input as ListObjectsV2CommandInput).ContinuationToken).toBe('token-1')
+
+		// Both batches get deleted
+		const firstDeleteCall = mockS3Client.send.mock.calls[1][0]
+		expect((firstDeleteCall.input as DeleteObjectsCommandInput).Delete?.Objects).toEqual([
+			{ Key: 'file1.html' },
+			{ Key: 'file2.css' }
+		])
+		const secondDeleteCall = mockS3Client.send.mock.calls[3][0]
+		expect((secondDeleteCall.input as DeleteObjectsCommandInput).Delete?.Objects).toEqual([
+			{ Key: 'file3.js' }
+		])
+	})
+
 	test('should skip object deletion when bucket is empty', async () => {
 		mockS3Client.send.mockResolvedValueOnce({
 			Contents: []
@@ -94,7 +138,7 @@ describe('prClosedAction', () => {
 			data: [{ id: 123 }] as any
 		})
 		mockGithubClient.rest.repos.createDeploymentStatus.mockResolvedValue({ data: [] as any })
-		mockGithubClient.rest.repos.deleteDeployment.mockResolvedValue({ data: [] as any })
+		mockGithubClient.rest.repos.deleteDeployment.mockResolvedValue({ data: undefined } as any)
 
 		await prClosedAction('test-bucket', 'PR-')
 

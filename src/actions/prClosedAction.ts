@@ -19,30 +19,40 @@ export default async (bucketName: string, environmentPrefix: string) => {
 
 	console.log('Emptying S3 bucket...')
 
-	console.log('Fetching objects...')
+	// ListObjectsV2 returns at most 1000 keys per call, so we page through the
+	// bucket with the continuation token and delete each batch until it's empty.
+	// Otherwise DeleteBucket fails with BucketNotEmpty on buckets over 1000 objects.
+	let continuationToken: string | undefined
+	let deletedAny = false
 
-	const listObjectsRequest = {
-		Bucket: bucketName
-	}
-	const listObjectsCommand = new ListObjectsV2Command(listObjectsRequest)
-	const objects = await getS3Client().send(listObjectsCommand)
-
-	if (objects.Contents && objects.Contents.length >= 1) {
-		const deleteObjectsRequest = {
+	do {
+		console.log('Fetching objects...')
+		const listObjectsCommand = new ListObjectsV2Command({
 			Bucket: bucketName,
-			Delete: {
-				Objects: [] as Array<ObjectIdentifier>
+			ContinuationToken: continuationToken
+		})
+		const objects = await getS3Client().send(listObjectsCommand)
+
+		if (objects.Contents && objects.Contents.length >= 1) {
+			const deleteObjectsRequest = {
+				Bucket: bucketName,
+				Delete: {
+					Objects: objects.Contents.map(
+						(object): ObjectIdentifier => ({ Key: object.Key })
+					)
+				}
 			}
+
+			console.log(`Deleting ${deleteObjectsRequest.Delete.Objects.length} objects...`)
+			const deleteObjectsCommand = new DeleteObjectsCommand(deleteObjectsRequest)
+			await getS3Client().send(deleteObjectsCommand)
+			deletedAny = true
 		}
 
-		for (const object of objects.Contents) {
-			deleteObjectsRequest.Delete.Objects.push({ Key: object.Key })
-		}
+		continuationToken = objects.IsTruncated ? objects.NextContinuationToken : undefined
+	} while (continuationToken)
 
-		console.log('Deleting objects...')
-		const deleteObjectsCommand = new DeleteObjectsCommand(deleteObjectsRequest)
-		await getS3Client().send(deleteObjectsCommand)
-	} else {
+	if (!deletedAny) {
 		console.log('S3 bucket already empty.')
 	}
 
