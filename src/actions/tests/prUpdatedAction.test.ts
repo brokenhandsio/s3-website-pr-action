@@ -9,7 +9,7 @@ import type { CreateBucketCommandInput, PutBucketWebsiteCommandInput } from '@aw
 
 // Mock s3UploadDirectory
 jest.mock('../../utils/s3UploadDirectory', () =>
-	(jest.fn() as jest.Mock<any>).mockResolvedValue(undefined)
+	jest.fn<() => Promise<void>>().mockResolvedValue(undefined)
 )
 
 // Mock checkBucketExists
